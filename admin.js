@@ -61,7 +61,14 @@ matchs.push(nouveauMatch);
 
 localStorage.setItem("adminMatches", JSON.stringify(matchs));
 
+afficherMatchs();
+
 alert("✅ Match enregistré !");
+
+document.getElementById("home-team").value = "";
+document.getElementById("away-team").value = "";
+document.getElementById("match-date").value = "";
+document.getElementById("match-time").value = "";
 
     };
 
