@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
             competition: "Ligue des champions",
             stage: "Phase de ligue",
             date: "Mardi 17 septembre",
+            Time: "21h00",
             kickoff: "2025-09-17T21:00:00",
             homeTeam: "Paris SG",
             homeLogo: "logos/psg.jpg",
@@ -352,6 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             inputmode="numeric"
                             autocomplete="off"
                             class="score-input"
+                            ${locked ? "disabled" : ""}
                             data-home-input="${escapeHtml(match.id)}"
                             aria-label="Score de ${escapeHtml(match.homeTeam)}"
                         >
@@ -367,6 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             inputmode="numeric"
                             autocomplete="off"
                             class="score-input"
+                            ${locked ? "disabled" : ""}
                             data-away-input="${escapeHtml(match.id)}"
                             aria-label="Score de ${escapeHtml(match.awayTeam)}"
                         >
@@ -422,12 +425,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
 
                 <button
-                    type="button"
-                    class="save-prediction-button"
-                    data-save-match="${escapeHtml(match.id)}"
-                >
-                    Valider
-                </button>
+    type="button"
+    class="save-prediction-button"
+    ${locked ? "disabled" : ""}
+    data-save-match="${escapeHtml(match.id)}"
+>
+    ${locked ? "Pronostics fermés" : "Valider"}
+</button>
 
             </div>
         `;
