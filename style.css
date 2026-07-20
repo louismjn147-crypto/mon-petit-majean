@@ -1385,10 +1385,6 @@ button {
     padding: 17px;
 }
 
-.match-card > .match-topline {
-    display: none;
-}
-
 .match-card-header {
     display: flex;
     align-items: center;
