@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             time: "21h00",
             kickoff: "2025-09-17T21:00:00",
             homeTeam: "Manchester City",
-            homeLogo: "logos/manchester.jpg",
+            homeLogo: "logos/manchester.png",
             awayTeam: "Inter Milan",
             awayLogo: "logos/inter.png",
             odds: {
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
             time: "21h00",
             kickoff: "2025-09-17T21:00:00",
             homeTeam: "RC Lens",
-            homeLogo: "logos/rclens.jpg",
+            homeLogo: "logos/rclens.png",
             awayTeam: "Real Madrid",
             awayLogo: "logos/madrid.png",
             odds: {
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
             time: "21h00",
             kickoff: "2025-09-17T21:00:00",
             homeTeam: "Bayern Munich",
-            homeLogo: "logos/munich.jpg",
+            homeLogo: "logos/munich.png",
             awayTeam: "Arsenal",
             awayLogo: "logos/arsenal.png",
             odds: {
