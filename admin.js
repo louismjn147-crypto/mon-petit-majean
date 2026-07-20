@@ -27,9 +27,11 @@ function login() {
     }
 
 }
-const addMatchButton = document.getElementById("add-match");
+document.addEventListener("click", function (event) {
 
-addMatchButton.addEventListener("click", function () {
+    if (event.target.id !== "add-match") {
+        return;
+    }
 
     const homeTeam = document.getElementById("home-team").value;
     const awayTeam = document.getElementById("away-team").value;
@@ -37,7 +39,7 @@ addMatchButton.addEventListener("click", function () {
     const matchTime = document.getElementById("match-time").value;
 
     alert(
-        "Match créé :\n\n" +
+        "Match créé !\n\n" +
         homeTeam +
         " - " +
         awayTeam +
