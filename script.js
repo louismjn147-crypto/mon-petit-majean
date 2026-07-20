@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
             date: "Mardi 17 septembre",
             time: "21h00",
             homeTeam: "Paris SG",
-            homeLogo: "logos/psg.png",
+            homeLogo: "logos/psg.jpg",
             awayTeam: "Real Madrid",
             awayShort: "RMA",
             odds: {
