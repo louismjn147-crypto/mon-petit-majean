@@ -976,4 +976,350 @@ footer {
         width: 100%;
         min-width: 0;
     }
+
+    /* =========================================
+   CARTES DE PRONOSTICS — STYLE COMPACT MPP
+========================================= */
+
+#matches-container {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+}
+
+.compact-match-card {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px 18px;
+    overflow: hidden;
+    border: 1px solid rgba(115, 145, 255, 0.18);
+    border-radius: 12px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(14, 27, 65, 0.96),
+            rgba(7, 16, 42, 0.98)
+        );
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.compact-match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+}
+
+.compact-match-header .competition {
+    margin: 0;
+    color: #54a4ff;
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.compact-match-date {
+    color: rgba(226, 234, 255, 0.58);
+    font-size: 0.7rem;
+}
+
+/* Ligne principale du match */
+
+.compact-teams-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 122px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.compact-team {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.compact-team strong {
+    display: block;
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 750;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.compact-home-team {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.compact-away-team {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.compact-odd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    padding: 3px 7px;
+    border: 1px solid rgba(63, 135, 255, 0.26);
+    border-radius: 6px;
+    color: #8fc5ff;
+    background: rgba(31, 91, 221, 0.1);
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+/* Bloc des deux cases de score */
+
+.compact-score-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.compact-score-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/*
+ * Force la suppression du champ blanc natif.
+ * Les !important écrasent les anciens styles.
+ */
+
+.compact-score-input {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+
+    box-sizing: border-box !important;
+    width: 45px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 1px solid rgba(111, 150, 255, 0.34) !important;
+    border-radius: 6px !important;
+    outline: none !important;
+
+    color: #ffffff !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(24, 31, 55, 0.98),
+            rgba(12, 18, 38, 0.98)
+        ) !important;
+
+    box-shadow:
+        inset 0 1px 4px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.015) !important;
+
+    text-align: center !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 850 !important;
+    line-height: 38px !important;
+}
+
+/* Retire les flèches des champs numériques */
+
+.compact-score-input::-webkit-inner-spin-button,
+.compact-score-input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.compact-score-input::placeholder {
+    color: rgba(255, 255, 255, 0.28);
+}
+
+.compact-score-input:hover {
+    border-color: rgba(95, 155, 255, 0.65) !important;
+}
+
+.compact-score-input:focus {
+    border-color: #4b91ff !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(30, 45, 82, 1),
+            rgba(14, 24, 53, 1)
+        ) !important;
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.14),
+        inset 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+}
+
+.compact-score-separator {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.exact-score-bonus {
+    color: rgba(181, 199, 236, 0.54);
+    font-size: 0.57rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Ligne cote du nul */
+
+.compact-draw-line {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    color: rgba(218, 228, 250, 0.58);
+    font-size: 0.65rem;
+}
+
+.compact-draw-line strong {
+    color: #8fc5ff;
+    font-size: 0.66rem;
+}
+
+/* Information des points */
+
+.compact-potential-points {
+    min-height: 18px !important;
+    margin: 8px 0 10px !important;
+    color: rgba(211, 222, 247, 0.58) !important;
+    text-align: center !important;
+    font-size: 0.67rem !important;
+    line-height: 1.35 !important;
+}
+
+.compact-potential-points strong {
+    color: #8fc5ff;
+}
+
+/* Bouton compact */
+
+.compact-validate-button {
+    display: block !important;
+    width: auto !important;
+    min-width: 190px !important;
+    margin: 0 auto !important;
+    padding: 8px 18px !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    color: #ffffff !important;
+    background:
+        linear-gradient(
+            100deg,
+            #2777ff,
+            #7958ff
+        ) !important;
+    box-shadow: 0 7px 18px rgba(67, 91, 255, 0.18);
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    cursor: pointer;
+}
+
+.compact-validate-button:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+/* Pronostic déjà enregistré */
+
+.compact-saved-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.compact-saved-score strong {
+    min-width: 88px;
+    padding: 8px 11px;
+    border: 1px solid rgba(109, 150, 255, 0.35);
+    border-radius: 6px;
+    color: #ffffff;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(24, 31, 55, 0.98),
+            rgba(12, 18, 38, 0.98)
+        );
+    text-align: center;
+    font-size: 1rem;
+}
+
+.compact-saved-score span {
+    color: rgba(211, 222, 247, 0.48);
+    font-size: 0.57rem;
+}
+
+.compact-saved-information,
+.compact-exact-information {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 0.65rem;
+}
+
+.compact-saved-information {
+    color: rgba(211, 222, 247, 0.58);
+}
+
+.compact-saved-information strong,
+.compact-exact-information {
+    color: #8fc5ff;
+}
+
+/* Version mobile */
+
+@media (max-width: 650px) {
+    .compact-match-card {
+        padding: 13px 9px;
+    }
+
+    .compact-teams-row {
+        grid-template-columns: minmax(0, 1fr) 104px minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    .compact-team strong {
+        font-size: 0.72rem;
+        white-space: normal;
+    }
+
+    .compact-score-input {
+        width: 39px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .compact-odd {
+        min-width: 0;
+        padding: 3px 5px;
+        font-size: 0.56rem;
+    }
+
+    .exact-score-bonus {
+        font-size: 0.49rem;
+    }
+
+    .compact-validate-button {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
 }
