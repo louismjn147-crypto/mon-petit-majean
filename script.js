@@ -314,9 +314,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="match-team match-team-home">
 
                     <img
-    src="${match.homeLogo}"
-    class="team-logo"
-    alt="${match.homeTeam}"
+    src="${escapeHtml(match.homeLogo)}"
+    alt="${escapeHtml(match.homeTeam)}"
+    style="
+        width:42px;
+        height:42px;
+        max-width:42px;
+        max-height:42px;
+        object-fit:contain;
+        display:block;
+    "
 >
 
                     <strong class="team-name">
@@ -378,8 +385,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     <img
     src="${escapeHtml(match.awayLogo)}"
-    class="team-logo"
     alt="${escapeHtml(match.awayTeam)}"
+    style="
+        width:42px;
+        height:42px;
+        max-width:42px;
+        max-height:42px;
+        object-fit:contain;
+        display:block;
+    "
 >
 
                     <strong class="team-name">
@@ -437,9 +451,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <div class="match-team match-team-home">
 
-                    <span class="team-badge">
-                        ${escapeHtml(match.homeShort)}
-                    </span>
+                    <img
+    src="${escapeHtml(match.homeLogo)}"
+    alt="${escapeHtml(match.homeTeam)}"
+    style="
+        width:42px;
+        height:42px;
+        max-width:42px;
+        max-height:42px;
+        object-fit:contain;
+        display:block;
+    "
+>
 
                     <strong class="team-name">
                         ${escapeHtml(match.homeTeam)}
@@ -477,9 +500,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <div class="match-team match-team-away">
 
-                    <span class="team-badge">
-                        ${escapeHtml(match.awayShort)}
-                    </span>
+                   <img
+    src="${escapeHtml(match.awayLogo)}"
+    alt="${escapeHtml(match.awayTeam)}"
+    style="
+        width:42px;
+        height:42px;
+        max-width:42px;
+        max-height:42px;
+        object-fit:contain;
+        display:block;
+    "
+>
 
                     <strong class="team-name">
                         ${escapeHtml(match.awayTeam)}
