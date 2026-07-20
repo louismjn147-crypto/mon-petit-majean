@@ -1,37 +1,61 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const EXACT_SCORE_BONUS = 150;
+
+    /*
+     * Pour saisir le résultat réel plus tard :
+     *
+     * actualScore: null
+     *
+     * devient par exemple :
+     *
+     * actualScore: {
+     *     home: 2,
+     *     away: 1
+     * }
+     */
+
     const matches = [
         {
             id: 1,
             home: "Real Madrid",
             away: "Manchester City",
             date: "Mardi 21h00",
-            choices: [
-                { value: "home", label: "Real Madrid", points: 210 },
-                { value: "draw", label: "Match nul", points: 360 },
-                { value: "away", label: "Manchester City", points: 295 }
-            ]
+
+            odds: {
+                home: 210,
+                draw: 360,
+                away: 295
+            },
+
+            actualScore: null
         },
         {
             id: 2,
             home: "Paris SG",
             away: "Bayern Munich",
             date: "Mardi 21h00",
-            choices: [
-                { value: "home", label: "Paris SG", points: 245 },
-                { value: "draw", label: "Match nul", points: 350 },
-                { value: "away", label: "Bayern Munich", points: 275 }
-            ]
+
+            odds: {
+                home: 245,
+                draw: 350,
+                away: 275
+            },
+
+            actualScore: null
         },
         {
             id: 3,
             home: "Arsenal",
             away: "Inter Milan",
             date: "Mercredi 21h00",
-            choices: [
-                { value: "home", label: "Arsenal", points: 185 },
-                { value: "draw", label: "Match nul", points: 370 },
-                { value: "away", label: "Inter Milan", points: 410 }
-            ]
+
+            odds: {
+                home: 185,
+                draw: 370,
+                away: 410
+            },
+
+            actualScore: null
         }
     ];
 
@@ -41,36 +65,145 @@ document.addEventListener("DOMContentLoaded", function () {
     const predictionsContainer =
         document.getElementById("my-predictions-container");
 
-    let currentSelections = {};
+    let savedPredictions = loadPredictions();
 
-    let savedPredictions = {};
+    function loadPredictions() {
+        try {
+            const storedPredictions =
+                localStorage.getItem("scorePredictions");
 
-    try {
-        savedPredictions =
-            JSON.parse(localStorage.getItem("predictions")) || {};
-    } catch (error) {
-        savedPredictions = {};
+            if (!storedPredictions) {
+                return {};
+            }
+
+            const parsedPredictions =
+                JSON.parse(storedPredictions);
+
+            if (
+                typeof parsedPredictions !== "object" ||
+                parsedPredictions === null
+            ) {
+                return {};
+            }
+
+            return parsedPredictions;
+        } catch (error) {
+            console.error(
+                "Impossible de charger les pronostics :",
+                error
+            );
+
+            return {};
+        }
     }
 
     function savePredictions() {
-        localStorage.setItem(
-            "predictions",
-            JSON.stringify(savedPredictions)
+        try {
+            localStorage.setItem(
+                "scorePredictions",
+                JSON.stringify(savedPredictions)
+            );
+        } catch (error) {
+            console.error(
+                "Impossible d'enregistrer les pronostics :",
+                error
+            );
+
+            alert(
+                "Une erreur empêche l'enregistrement du pronostic."
+            );
+        }
+    }
+
+    function getOutcome(homeScore, awayScore) {
+        if (homeScore > awayScore) {
+            return "home";
+        }
+
+        if (homeScore < awayScore) {
+            return "away";
+        }
+
+        return "draw";
+    }
+
+    function getOutcomeLabel(match, outcome) {
+        if (outcome === "home") {
+            return `Victoire ${match.home}`;
+        }
+
+        if (outcome === "away") {
+            return `Victoire ${match.away}`;
+        }
+
+        return "Match nul";
+    }
+
+    function getPredictionResult(match, prediction) {
+        if (!match.actualScore) {
+            return {
+                status: "pending",
+                points: null,
+                message: "En attente du résultat"
+            };
+        }
+
+        const predictedOutcome = getOutcome(
+            prediction.homeScore,
+            prediction.awayScore
         );
+
+        const actualOutcome = getOutcome(
+            match.actualScore.home,
+            match.actualScore.away
+        );
+
+        const exactScore =
+            prediction.homeScore === match.actualScore.home &&
+            prediction.awayScore === match.actualScore.away;
+
+        if (exactScore) {
+            return {
+                status: "exact",
+                points:
+                    match.odds[actualOutcome] +
+                    EXACT_SCORE_BONUS,
+                message: `Score exact : +${EXACT_SCORE_BONUS} pts de bonus`
+            };
+        }
+
+        if (predictedOutcome === actualOutcome) {
+            return {
+                status: "correct",
+                points: match.odds[actualOutcome],
+                message: "Bon résultat"
+            };
+        }
+
+        return {
+            status: "wrong",
+            points: 0,
+            message: "Mauvais résultat"
+        };
     }
 
     function renderMatches() {
         if (!matchesContainer) {
             console.error(
-                "Erreur : matches-container est introuvable."
+                'La zone "matches-container" est introuvable.'
             );
+
             return;
         }
 
         matchesContainer.innerHTML = matches
             .map(function (match) {
-                const savedPrediction =
+                const prediction =
                     savedPredictions[match.id];
+
+                const result = prediction
+                    ? getPredictionResult(match, prediction)
+                    : null;
 
                 return `
                     <article class="match-card">
@@ -90,143 +223,392 @@ document.addEventListener("DOMContentLoaded", function () {
                             </p>
                         </div>
 
-                        <div class="choices">
-                            ${match.choices
-                                .map(function (choice) {
-                                    const selected =
-                                        savedPrediction &&
-                                        savedPrediction.value ===
-                                            choice.value;
+                        <div class="odds-grid">
+                            <div class="odd-box">
+                                <span>${match.home}</span>
+                                <strong>
+                                    ${match.odds.home} pts
+                                </strong>
+                            </div>
 
-                                    return `
-                                        <button
-                                            type="button"
-                                            class="choice ${
-                                                selected
-                                                    ? "selected"
-                                                    : ""
-                                            }"
-                                            data-match-id="${match.id}"
-                                            data-value="${choice.value}"
-                                            data-label="${choice.label}"
-                                            data-points="${choice.points}"
-                                            ${
-                                                savedPrediction
-                                                    ? "disabled"
-                                                    : ""
-                                            }
-                                        >
-                                            <span>
-                                                ${choice.label}
-                                            </span>
+                            <div class="odd-box">
+                                <span>Match nul</span>
+                                <strong>
+                                    ${match.odds.draw} pts
+                                </strong>
+                            </div>
 
-                                            <strong>
-                                                +${choice.points} pts
-                                            </strong>
-                                        </button>
-                                    `;
-                                })
-                                .join("")}
+                            <div class="odd-box">
+                                <span>${match.away}</span>
+                                <strong>
+                                    ${match.odds.away} pts
+                                </strong>
+                            </div>
                         </div>
 
-                        <button
-                            type="button"
-                            class="validate-button"
-                            data-validate-id="${match.id}"
-                            ${
-                                savedPrediction
-                                    ? "disabled"
-                                    : ""
-                            }
-                        >
-                            ${
-                                savedPrediction
-                                    ? "Pronostic enregistré"
-                                    : "Valider mon pronostic"
-                            }
-                        </button>
-
                         ${
-                            savedPrediction
-                                ? `
-                                    <p class="saved-message">
-                                        Ton choix :
-                                        <strong>
-                                            ${savedPrediction.label}
-                                        </strong>
-                                        — ${savedPrediction.points}
-                                        points possibles
-                                    </p>
-                                `
-                                : ""
+                            prediction
+                                ? renderSavedPrediction(
+                                    match,
+                                    prediction,
+                                    result
+                                )
+                                : renderScoreForm(match)
                         }
                     </article>
                 `;
             })
             .join("");
 
-        addEvents();
+        addScoreEvents();
+        addDeleteEvents();
     }
 
-    function addEvents() {
-        const choices =
-            document.querySelectorAll(".choice");
+    function renderScoreForm(match) {
+        return `
+            <div class="score-prediction">
+                <p class="score-instruction">
+                    Entre ton score exact
+                </p>
 
-        choices.forEach(function (button) {
-            button.addEventListener("click", function () {
-                const matchId =
-                    button.getAttribute("data-match-id");
+                <div class="score-inputs">
+                    <div class="score-team">
+                        <label for="home-score-${match.id}">
+                            ${match.home}
+                        </label>
 
-                if (savedPredictions[matchId]) {
+                        <input
+                            id="home-score-${match.id}"
+                            class="score-input"
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            placeholder="0"
+                            data-home-score="${match.id}"
+                        >
+                    </div>
+
+                    <span class="score-separator">
+                        -
+                    </span>
+
+                    <div class="score-team">
+                        <label for="away-score-${match.id}">
+                            ${match.away}
+                        </label>
+
+                        <input
+                            id="away-score-${match.id}"
+                            class="score-input"
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            placeholder="0"
+                            data-away-score="${match.id}"
+                        >
+                    </div>
+                </div>
+
+                <p
+                    class="potential-points"
+                    id="potential-points-${match.id}"
+                >
+                    Saisis un score pour voir les points possibles.
+                </p>
+
+                <button
+                    type="button"
+                    class="validate-button"
+                    data-save-score="${match.id}"
+                >
+                    Valider mon score
+                </button>
+            </div>
+        `;
+    }
+
+    function renderSavedPrediction(
+        match,
+        prediction,
+        result
+    ) {
+        let resultHtml = "";
+
+        if (result.status === "pending") {
+            resultHtml = `
+                <div class="prediction-status pending">
+                    Résultat en attente
+                </div>
+            `;
+        } else {
+            resultHtml = `
+                <div class="prediction-result ${result.status}">
+                    <span>${result.message}</span>
+
+                    <strong>
+                        ${result.points} pts gagnés
+                    </strong>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="saved-score-box">
+                <p class="saved-score-label">
+                    Ton pronostic
+                </p>
+
+                <div class="saved-score">
+                    <span>${match.home}</span>
+
+                    <strong>
+                        ${prediction.homeScore}
+                        -
+                        ${prediction.awayScore}
+                    </strong>
+
+                    <span>${match.away}</span>
+                </div>
+
+                <p class="saved-outcome">
+                    ${getOutcomeLabel(
+                        match,
+                        prediction.outcome
+                    )}
+                    —
+                    ${prediction.basePoints}
+                    pts possibles
+                </p>
+
+                <p class="exact-bonus-information">
+                    Score exact :
+                    ${prediction.basePoints}
+                    + ${EXACT_SCORE_BONUS}
+                    =
+                    ${prediction.basePoints + EXACT_SCORE_BONUS}
+                    pts
+                </p>
+
+                ${resultHtml}
+
+                ${
+                    match.actualScore
+                        ? ""
+                        : `
+                            <button
+                                type="button"
+                                class="delete-prediction-button"
+                                data-delete-score="${match.id}"
+                            >
+                                Modifier mon pronostic
+                            </button>
+                        `
+                }
+            </div>
+        `;
+    }
+
+    function addScoreEvents() {
+        const saveButtons =
+            document.querySelectorAll("[data-save-score]");
+
+        saveButtons.forEach(function (button) {
+            const matchId = Number(
+                button.getAttribute("data-save-score")
+            );
+
+            const homeInput =
+                document.querySelector(
+                    `[data-home-score="${matchId}"]`
+                );
+
+            const awayInput =
+                document.querySelector(
+                    `[data-away-score="${matchId}"]`
+                );
+
+            if (!homeInput || !awayInput) {
+                return;
+            }
+
+            function updatePotentialPoints() {
+                const homeValue =
+                    homeInput.value.trim();
+
+                const awayValue =
+                    awayInput.value.trim();
+
+                const information =
+                    document.getElementById(
+                        `potential-points-${matchId}`
+                    );
+
+                if (!information) {
                     return;
                 }
 
-                currentSelections[matchId] = {
-                    value: button.getAttribute("data-value"),
-                    label: button.getAttribute("data-label"),
-                    points: Number(
-                        button.getAttribute("data-points")
-                    )
-                };
+                if (
+                    homeValue === "" ||
+                    awayValue === ""
+                ) {
+                    information.textContent =
+                        "Saisis un score pour voir les points possibles.";
 
-                document
-                    .querySelectorAll(
-                        `[data-match-id="${matchId}"]`
-                    )
-                    .forEach(function (choiceButton) {
-                        choiceButton.classList.remove(
-                            "selected"
-                        );
-                    });
+                    return;
+                }
 
-                button.classList.add("selected");
+                const homeScore = Number(homeValue);
+                const awayScore = Number(awayValue);
+
+                if (
+                    !Number.isInteger(homeScore) ||
+                    !Number.isInteger(awayScore) ||
+                    homeScore < 0 ||
+                    awayScore < 0
+                ) {
+                    information.textContent =
+                        "Le score doit contenir des nombres entiers positifs.";
+
+                    return;
+                }
+
+                const match = matches.find(function (item) {
+                    return item.id === matchId;
+                });
+
+                if (!match) {
+                    return;
+                }
+
+                const outcome =
+                    getOutcome(homeScore, awayScore);
+
+                const basePoints =
+                    match.odds[outcome];
+
+                information.innerHTML = `
+                    Bon résultat :
+                    <strong>${basePoints} pts</strong>
+
+                    <br>
+
+                    Score exact :
+                    <strong>
+                        ${basePoints + EXACT_SCORE_BONUS} pts
+                    </strong>
+                `;
+            }
+
+            homeInput.addEventListener(
+                "input",
+                updatePotentialPoints
+            );
+
+            awayInput.addEventListener(
+                "input",
+                updatePotentialPoints
+            );
+
+            button.addEventListener("click", function () {
+                saveScorePrediction(
+                    matchId,
+                    homeInput,
+                    awayInput
+                );
             });
         });
+    }
 
-        const validateButtons =
-            document.querySelectorAll("[data-validate-id]");
+    function saveScorePrediction(
+        matchId,
+        homeInput,
+        awayInput
+    ) {
+        const homeValue =
+            homeInput.value.trim();
 
-        validateButtons.forEach(function (button) {
+        const awayValue =
+            awayInput.value.trim();
+
+        if (
+            homeValue === "" ||
+            awayValue === ""
+        ) {
+            alert(
+                "Entre le score des deux équipes."
+            );
+
+            return;
+        }
+
+        const homeScore = Number(homeValue);
+        const awayScore = Number(awayValue);
+
+        if (
+            !Number.isInteger(homeScore) ||
+            !Number.isInteger(awayScore) ||
+            homeScore < 0 ||
+            awayScore < 0 ||
+            homeScore > 20 ||
+            awayScore > 20
+        ) {
+            alert(
+                "Entre un score valide entre 0 et 20."
+            );
+
+            return;
+        }
+
+        const match = matches.find(function (item) {
+            return item.id === matchId;
+        });
+
+        if (!match) {
+            alert("Ce match est introuvable.");
+            return;
+        }
+
+        const outcome =
+            getOutcome(homeScore, awayScore);
+
+        savedPredictions[matchId] = {
+            homeScore: homeScore,
+            awayScore: awayScore,
+            outcome: outcome,
+            basePoints: match.odds[outcome]
+        };
+
+        savePredictions();
+        renderMatches();
+        renderPredictions();
+    }
+
+    function addDeleteEvents() {
+        const deleteButtons =
+            document.querySelectorAll(
+                "[data-delete-score]"
+            );
+
+        deleteButtons.forEach(function (button) {
             button.addEventListener("click", function () {
                 const matchId =
-                    button.getAttribute("data-validate-id");
-
-                const selection =
-                    currentSelections[matchId];
-
-                if (!selection) {
-                    alert(
-                        "Choisis une équipe ou le match nul avant de valider."
+                    button.getAttribute(
+                        "data-delete-score"
                     );
+
+                const confirmed = confirm(
+                    "Modifier ce pronostic ? Le score actuel sera supprimé."
+                );
+
+                if (!confirmed) {
                     return;
                 }
 
-                savedPredictions[matchId] = selection;
+                delete savedPredictions[matchId];
 
                 savePredictions();
-
-                delete currentSelections[matchId];
-
                 renderMatches();
                 renderPredictions();
             });
@@ -247,6 +629,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     Aucun pronostic enregistré pour le moment.
                 </p>
             `;
+
             return;
         }
 
@@ -260,21 +643,47 @@ document.addEventListener("DOMContentLoaded", function () {
                     return "";
                 }
 
+                const result =
+                    getPredictionResult(
+                        match,
+                        prediction
+                    );
+
+                let pointsText =
+                    "Résultat en attente";
+
+                if (result.points !== null) {
+                    pointsText =
+                        `${result.points} pts gagnés`;
+                }
+
                 return `
                     <article class="prediction-card">
                         <div>
                             <strong>
-                                ${match.home} - ${match.away}
+                                ${match.home}
+                                ${prediction.homeScore}
+                                -
+                                ${prediction.awayScore}
+                                ${match.away}
                             </strong>
 
                             <p>
-                                Ton choix :
-                                ${prediction.label}
+                                ${getOutcomeLabel(
+                                    match,
+                                    prediction.outcome
+                                )}
+                            </p>
+
+                            <p>
+                                Score exact :
+                                ${prediction.basePoints + EXACT_SCORE_BONUS}
+                                pts possibles
                             </p>
                         </div>
 
                         <span class="prediction-points">
-                            ${prediction.points} pts possibles
+                            ${pointsText}
                         </span>
                     </article>
                 `;
