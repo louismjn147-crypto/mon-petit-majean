@@ -221,6 +221,7 @@ a {
     border: 1px solid var(--border);
     border-radius: 16px;
     background: rgba(7, 14, 35, 0.8);
+    
 }
 
 .menu-button {
@@ -230,6 +231,8 @@ a {
     color: var(--muted);
     background: transparent;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
 }
 
 .menu-button.active {
