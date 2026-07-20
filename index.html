@@ -3,157 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Mon Petit Majean</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <section id="mes-pronos" class="my-predictions-section">
-    <div class="section-header">
-        <div>
-            <p class="section-kicker">Tes choix</p>
-            <h2>Mes pronostics</h2>
+    <div class="stars"></div>
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon">★</div>
+
+            <div>
+                <p class="brand-small">Compétition privée</p>
+                <h1>Mon Petit Majean</h1>
+            </div>
         </div>
-    </div>
 
-    <div id="my-predictions-container" class="my-predictions-list">
-        <p class="empty-message">
-            Aucun pronostic enregistré pour le moment.
-        </p>
-    </div>
+        <div class="profile">
+            <span class="profile-avatar">L</span>
 
-    </section>
-    
-<div class="stars"></div>
-
-<header class="topbar">
-    <div class="brand">
-        <div class="brand-icon">★</div>
-
-        <div>
-            <p class="brand-small">Compétition privée</p>
-            <h1>Mon Petit Majean</h1>
+            <div>
+                <span class="profile-label">Joueur</span>
+                <strong>Louis</strong>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="profile">
-        <span class="profile-avatar">L</span>
+    <main class="page">
 
-        <div>
-            <span class="profile-label">Joueur</span>
-            <strong>Louis</strong>
-        </div>
-    </div>
-</header>
+        <section class="hero">
+            <div class="hero-content">
+                <p class="hero-kicker">Saison 2026-2027</p>
 
-<main class="page">
+                <h2>
+                    La Ligue des champions<br>
+                    entre proches
+                </h2>
 
-    <section class="hero">
-        <div class="hero-content">
-            <p class="hero-kicker">Saison 2026-2027</p>
+                <p class="hero-text">
+                    Pronostique les affiches, marque les points liés aux cotes
+                    et prends la tête du classement.
+                </p>
 
-            <h2>
-                La Ligue des champions<br>
-                entre proches
-            </h2>
+                <a href="#matches" class="hero-button">
+                    Faire mes pronostics
+                </a>
+            </div>
 
-            <p class="hero-text">
-                Pronostique les affiches, marque les points liés aux cotes
-                et prends la tête du classement.
-            </p>
+            <div class="hero-card">
+                <p>Ton classement</p>
+                <strong class="hero-position">#2</strong>
+                <span>2 210 points</span>
+            </div>
+        </section>
 
-            <a href="#matches" class="hero-button">
-                Faire mes pronostics
+        <nav class="menu">
+            <a class="menu-button active" href="#matches">
+                Matchs
             </a>
-        </div>
 
-        <div class="hero-card">
-            <p>Ton classement</p>
-            <strong class="hero-position">#2</strong>
-            <span>2 210 points</span>
-        </div>
-    </section>
+            <a class="menu-button" href="#classement">
+                Classement
+            </a>
 
-    <nav class="menu">
-    <a class="menu-button active" href="#matches">Matchs</a>
-    <a class="menu-button" href="#classement">Classement</a>
-    <a class="menu-button" href="#mes-pronos">Mes pronos</a>
-    <a class="menu-button" href="#profil">Profil</a>
+            <a class="menu-button" href="#mes-pronos">
+                Mes pronos
+            </a>
 
-    </nav>
+            <a class="menu-button" href="#profil">
+                Profil
+            </a>
+        </nav>
 
-    <div id="matches-container"></div>
-        <div class="section-header">
-            <div>
-                <p class="section-kicker">Journée européenne</p>
-                <h2>Matchs à pronostiquer</h2>
-            </div>
+        <section id="matches" class="matches-section">
+            <div class="section-header">
+                <div>
+                    <p class="section-kicker">
+                        Journée européenne
+                    </p>
 
-            <span class="round-badge">
-                3 matchs
-            </span>
-        </div>
-
-        <div id="matches-container"></div>
-    </section>
-
-    <section class="ranking-section" id="classement">
-        <div class="section-header">
-            <div>
-                <p class="section-kicker">Classement général</p>
-                <h2>Top joueurs</h2>
-            </div>
-
-            <button class="link-button">Voir tout</button>
-        </div>
-
-        <div class="ranking-card">
-            <div class="ranking-line first">
-                <span class="rank">1</span>
-                <span class="medal">🏆</span>
-
-                <div class="ranking-player">
-                    <strong>Thomas</strong>
-                    <span>12 bons pronostics</span>
+                    <h2>Matchs à pronostiquer</h2>
                 </div>
 
-                <strong class="ranking-points">2 450 pts</strong>
+                <span class="round-badge">
+                    3 matchs
+                </span>
             </div>
 
-            <div class="ranking-line current">
-                <span class="rank">2</span>
-                <span class="medal">⭐</span>
+            <div id="matches-container"></div>
+        </section>
 
-                <div class="ranking-player">
-                    <strong>Louis</strong>
-                    <span>11 bons pronostics</span>
+        <section id="mes-pronos" class="my-predictions-section">
+            <div class="section-header">
+                <div>
+                    <p class="section-kicker">
+                        Tes choix
+                    </p>
+
+                    <h2>Mes pronostics</h2>
+                </div>
+            </div>
+
+            <div
+                id="my-predictions-container"
+                class="my-predictions-list"
+            >
+                <p class="empty-message">
+                    Aucun pronostic enregistré pour le moment.
+                </p>
+            </div>
+        </section>
+
+        <section class="ranking-section" id="classement">
+            <div class="section-header">
+                <div>
+                    <p class="section-kicker">
+                        Classement général
+                    </p>
+
+                    <h2>Top joueurs</h2>
                 </div>
 
-                <strong class="ranking-points">2 210 pts</strong>
+                <button class="link-button">
+                    Voir tout
+                </button>
             </div>
 
-            <div class="ranking-line">
-                <span class="rank">3</span>
-                <span class="medal">🥉</span>
+            <div class="ranking-card">
+                <div class="ranking-line first">
+                    <span class="rank">1</span>
+                    <span class="medal">🏆</span>
 
-                <div class="ranking-player">
-                    <strong>Hugo</strong>
-                    <span>9 bons pronostics</span>
+                    <div class="ranking-player">
+                        <strong>Thomas</strong>
+                        <span>12 bons pronostics</span>
+                    </div>
+
+                    <strong class="ranking-points">
+                        2 450 pts
+                    </strong>
                 </div>
 
-                <strong class="ranking-points">1 980 pts</strong>
+                <div class="ranking-line current">
+                    <span class="rank">2</span>
+                    <span class="medal">⭐</span>
+
+                    <div class="ranking-player">
+                        <strong>Louis</strong>
+                        <span>11 bons pronostics</span>
+                    </div>
+
+                    <strong class="ranking-points">
+                        2 210 pts
+                    </strong>
+                </div>
+
+                <div class="ranking-line">
+                    <span class="rank">3</span>
+                    <span class="medal">🥉</span>
+
+                    <div class="ranking-player">
+                        <strong>Hugo</strong>
+                        <span>9 bons pronostics</span>
+                    </div>
+
+                    <strong class="ranking-points">
+                        1 980 pts
+                    </strong>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-</main>
+        <section id="profil" class="profile-section">
+            <div class="section-header">
+                <div>
+                    <p class="section-kicker">
+                        Compte joueur
+                    </p>
 
-<footer>
-    Jeu privé de pronostics — aucun argent réel
-</footer>
+                    <h2>Profil</h2>
+                </div>
+            </div>
 
-<script src="script.js"></script>
+            <div class="empty-message">
+                Profil de Louis
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        Jeu privé de pronostics — aucun argent réel
+    </footer>
+
+    <script src="script.js"></script>
 
 </body>
 </html>
