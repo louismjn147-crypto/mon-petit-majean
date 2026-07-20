@@ -89,33 +89,48 @@ function afficherMatchs() {
 
     liste.innerHTML = "";
 
-    matchs.forEach(function(match) {
+    matchs.forEach(function(match, index) {
 
         liste.innerHTML += `
-            <div style="
-                background:#243244;
-                padding:15px;
-                border-radius:10px;
-                margin-bottom:10px;
-            ">
+    <div style="
+        background:#243244;
+        padding:15px;
+        border-radius:10px;
+        margin-bottom:10px;
+    ">
 
-                <strong>${match.homeTeam}</strong>
+        <strong>${match.homeTeam}</strong>
+        -
+        <strong>${match.awayTeam}</strong>
 
-                -
+        <br><br>
 
-                <strong>${match.awayTeam}</strong>
+        ${match.date} à ${match.time}
 
-                <br><br>
+        <br><br>
 
-                ${match.date}
+        <button onclick="supprimerMatch(${index})">
+            🗑️ Supprimer
+        </button>
 
-                à
-
-                ${match.time}
-
-            </div>
-        `;
+    </div>
+`;
 
     });
+
+}
+function supprimerMatch(index) {
+
+    let matchs = JSON.parse(localStorage.getItem("adminMatches")) || [];
+
+    if (!confirm("Supprimer ce match ?")) {
+        return;
+    }
+
+    matchs.splice(index, 1);
+
+    localStorage.setItem("adminMatches", JSON.stringify(matchs));
+
+    afficherMatchs();
 
 }
