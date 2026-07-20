@@ -48,22 +48,40 @@ function initialiseAdmin() {
             .getElementById("match-time")
             .value;
 
-        if (
-            domicile === "" ||
-            exterieur === "" ||
-            date === "" ||
-            heure === ""
-        ) {
-            alert("Remplis tous les champs.");
-            return;
-        }
+        const coteDomicile = Number(
+    document.getElementById("home-odds").value
+);
+
+const coteNul = Number(
+    document.getElementById("draw-odds").value
+);
+
+const coteExterieur = Number(
+    document.getElementById("away-odds").value
+);
+
+       if (
+    domicile === "" ||
+    exterieur === "" ||
+    date === "" ||
+    heure === "" ||
+    coteDomicile <= 0 ||
+    coteNul <= 0 ||
+    coteExterieur <= 0
+) {
+    alert("Remplis tous les champs et ajoute les trois cotes.");
+    return;
+}
 
         const nouveauMatch = {
-            homeTeam: domicile,
-            awayTeam: exterieur,
-            date: date,
-            time: heure
-        };
+    homeTeam: domicile,
+    awayTeam: exterieur,
+    date: date,
+    time: heure,
+    homeOdds: coteDomicile,
+    drawOdds: coteNul,
+    awayOdds: coteExterieur
+};
 
         const matchs =
             JSON.parse(localStorage.getItem("adminMatches")) || [];
@@ -131,7 +149,15 @@ function afficherMatchs() {
 
             ${match.date} à ${match.time}
 
-            <br><br>
+<br><br>
+
+Victoire ${match.homeTeam} : ${match.homeOdds} pts
+<br>
+Match nul : ${match.drawOdds} pts
+<br>
+Victoire ${match.awayTeam} : ${match.awayOdds} pts
+
+<br><br>
 
             <button
                 type="button"
@@ -203,6 +229,15 @@ function modifierMatch(index) {
 
     document.getElementById("add-match").textContent =
         "Enregistrer les modifications";
+    
+    document.getElementById("home-odds").value =
+    match.homeOdds || "";
+
+document.getElementById("draw-odds").value =
+    match.drawOdds || "";
+
+document.getElementById("away-odds").value =
+    match.awayOdds || "";
 
     window.scrollTo({
         top: 0,
@@ -243,8 +278,12 @@ function supprimerMatch(index) {
 }
 
 function viderFormulaire() {
+ function viderFormulaire() {
     document.getElementById("home-team").value = "";
     document.getElementById("away-team").value = "";
     document.getElementById("match-date").value = "";
     document.getElementById("match-time").value = "";
+    document.getElementById("home-odds").value = "";
+    document.getElementById("draw-odds").value = "";
+    document.getElementById("away-odds").value = "";
 }
