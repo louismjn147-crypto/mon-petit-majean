@@ -72,7 +72,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 away: 380
             },
             finalScore: null
-        }
+        },
+        {
+    id: "UCL 4",
+    stage: "Phase de Ligue",
+    date: "Mercredi 13 Mars 2026",
+    time: "21h00",
+    homeTeam: "RC Lens",
+    homeShort: "RCL",
+    awayTeam: "Lille OSC",
+    awayShort: "LOSC",
+    odds:{
+        home:150,
+        draw:300,
+        away:250
+    },
+    finalScore:null
     ];
 
     const matchesContainer = document.getElementById(
