@@ -72,22 +72,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 away: 380
             },
             finalScore: null
-        },
-        {
-    id: "UCL 4",
-    stage: "Phase de Ligue",
-    date: "Mercredi 13 Mars 2026",
-    time: "21h00",
-    homeTeam: "RC Lens",
-    homeShort: "RCL",
-    awayTeam: "Lille OSC",
-    awayShort: "LOSC",
-    odds:{
-        home:150,
-        draw:300,
-        away:250
     },
-    finalScore:null
+        {
+            id: "Rc Lens- Lille OSC",
+            competition: "Ligue des champions",
+            stage: "Phase de ligue",
+            date: "Mercredi 18 septembre",
+            time: "21h00",
+            homeTeam: "Racing club de Lens",
+            homeShort: "RCL",
+            awayTeam: "Lille Olympique Sporting club",
+            awayShort: "LOSC",
+            odds: {
+                home: 190,
+                draw: 335,
+                away: 265
+            },
+            finalScore: null
     ];
 
     const matchesContainer = document.getElementById(
