@@ -1,0 +1,46 @@
+body {
+
+font-family: Arial;
+
+background:#eeeeee;
+
+text-align:center;
+
+}
+
+
+h1 {
+
+background:#111;
+
+color:white;
+
+padding:20px;
+
+}
+
+
+div {
+
+background:white;
+
+margin:20px;
+
+padding:20px;
+
+border-radius:15px;
+
+}
+
+
+button {
+
+padding:15px;
+
+background:black;
+
+color:white;
+
+border-radius:10px;
+
+}
