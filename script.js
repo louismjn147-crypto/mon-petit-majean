@@ -376,9 +376,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <div class="match-team match-team-away">
 
-                    <span class="team-badge">
-                        ${escapeHtml(match.awayShort)}
-                    </span>
+                    <img
+    src="${escapeHtml(match.awayLogo)}"
+    class="team-logo"
+    alt="${escapeHtml(match.awayTeam)}"
+>
 
                     <strong class="team-name">
                         ${escapeHtml(match.awayTeam)}
