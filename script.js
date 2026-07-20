@@ -39,6 +39,23 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             finalScore: null
         },
+         {
+            id: "RCLens-Losc",
+            competition: "Ligue des champions",
+            stage: "Phase de ligue",
+            date: "Mardi 17 septembre",
+            time: "21h00",
+            homeTeam: "RC Lens",
+            homeShort: "RCL",
+            awayTeam: "Real Madrid",
+            awayShort: "RMA",
+            odds: {
+                home: 175,
+                draw: 320,
+                away: 205
+            },
+            finalScore: null
+        },
         {
             id: "bayern-arsenal",
             competition: "Ligue des champions",
