@@ -5,6 +5,8 @@ const passwordInput = document.getElementById("admin-password");
 const loginBox = document.querySelector(".admin-login");
 const adminPanel = document.getElementById("admin-panel");
 
+let matchEnModification = null;
+
 loginButton.addEventListener("click", login);
 
 passwordInput.addEventListener("keydown", function (event) {
@@ -66,21 +68,27 @@ function initialiseAdmin() {
         const matchs =
             JSON.parse(localStorage.getItem("adminMatches")) || [];
 
-        matchs.push(nouveauMatch);
+        if (matchEnModification === null) {
+            matchs.push(nouveauMatch);
+
+            alert("✅ Match enregistré !");
+        } else {
+            matchs[matchEnModification] = nouveauMatch;
+
+            matchEnModification = null;
+
+            boutonAjouter.textContent = "Ajouter le match";
+
+            alert("✅ Match modifié !");
+        }
 
         localStorage.setItem(
             "adminMatches",
             JSON.stringify(matchs)
         );
 
+        viderFormulaire();
         afficherMatchs();
-
-        document.getElementById("home-team").value = "";
-        document.getElementById("away-team").value = "";
-        document.getElementById("match-date").value = "";
-        document.getElementById("match-time").value = "";
-
-        alert("✅ Match enregistré !");
     };
 }
 
@@ -91,6 +99,7 @@ function afficherMatchs() {
         console.error(
             'Le bloc <div id="matches-list"></div> est introuvable.'
         );
+
         return;
     }
 
@@ -99,6 +108,7 @@ function afficherMatchs() {
 
     if (matchs.length === 0) {
         liste.innerHTML = "<p>Aucun match enregistré.</p>";
+
         return;
     }
 
@@ -125,6 +135,14 @@ function afficherMatchs() {
 
             <button
                 type="button"
+                class="edit-match-button"
+                data-index="${index}"
+            >
+                ✏️ Modifier
+            </button>
+
+            <button
+                type="button"
                 class="delete-match-button"
                 data-index="${index}"
             >
@@ -133,6 +151,17 @@ function afficherMatchs() {
         `;
 
         liste.appendChild(carte);
+    });
+
+    const boutonsModifier =
+        document.querySelectorAll(".edit-match-button");
+
+    boutonsModifier.forEach(function (bouton) {
+        bouton.addEventListener("click", function () {
+            const index = Number(bouton.dataset.index);
+
+            modifierMatch(index);
+        });
     });
 
     const boutonsSupprimer =
@@ -144,6 +173,40 @@ function afficherMatchs() {
 
             supprimerMatch(index);
         });
+    });
+}
+
+function modifierMatch(index) {
+    const matchs =
+        JSON.parse(localStorage.getItem("adminMatches")) || [];
+
+    const match = matchs[index];
+
+    if (!match) {
+        alert("Ce match est introuvable.");
+        return;
+    }
+
+    document.getElementById("home-team").value =
+        match.homeTeam;
+
+    document.getElementById("away-team").value =
+        match.awayTeam;
+
+    document.getElementById("match-date").value =
+        match.date;
+
+    document.getElementById("match-time").value =
+        match.time;
+
+    matchEnModification = index;
+
+    document.getElementById("add-match").textContent =
+        "Enregistrer les modifications";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
     });
 }
 
@@ -162,5 +225,26 @@ function supprimerMatch(index) {
         JSON.stringify(matchs)
     );
 
+    if (matchEnModification === index) {
+        matchEnModification = null;
+
+        viderFormulaire();
+
+        document.getElementById("add-match").textContent =
+            "Ajouter le match";
+    } else if (
+        matchEnModification !== null &&
+        matchEnModification > index
+    ) {
+        matchEnModification--;
+    }
+
     afficherMatchs();
+}
+
+function viderFormulaire() {
+    document.getElementById("home-team").value = "";
+    document.getElementById("away-team").value = "";
+    document.getElementById("match-date").value = "";
+    document.getElementById("match-time").value = "";
 }
