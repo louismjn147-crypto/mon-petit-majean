@@ -47,16 +47,20 @@ function initialiseAdmin() {
             return;
         }
 
-        alert(
-            "✅ Match ajouté !\n\n" +
-            domicile +
-            " vs " +
-            exterieur +
-            "\n\n" +
-            date +
-            " à " +
-            heure
-        );
+        const nouveauMatch = {
+    homeTeam: domicile,
+    awayTeam: exterieur,
+    date: date,
+    time: heure
+};
+
+let matchs = JSON.parse(localStorage.getItem("adminMatches")) || [];
+
+matchs.push(nouveauMatch);
+
+localStorage.setItem("adminMatches", JSON.stringify(matchs));
+
+alert("✅ Match enregistré !");
 
     };
 
