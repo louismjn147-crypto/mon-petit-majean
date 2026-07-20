@@ -24,6 +24,7 @@ function login() {
     adminPanel.style.display = "block";
 
     initialiseAdmin();
+    afficherMatchs();
 }
 
 function initialiseAdmin() {
@@ -63,5 +64,51 @@ localStorage.setItem("adminMatches", JSON.stringify(matchs));
 alert("✅ Match enregistré !");
 
     };
+
+}
+function afficherMatchs() {
+
+    const liste = document.getElementById("matches-list");
+
+    const matchs =
+        JSON.parse(localStorage.getItem("adminMatches")) || [];
+
+    if (matchs.length === 0) {
+
+        liste.innerHTML = "<p>Aucun match enregistré.</p>";
+
+        return;
+    }
+
+    liste.innerHTML = "";
+
+    matchs.forEach(function(match) {
+
+        liste.innerHTML += `
+            <div style="
+                background:#243244;
+                padding:15px;
+                border-radius:10px;
+                margin-bottom:10px;
+            ">
+
+                <strong>${match.homeTeam}</strong>
+
+                -
+
+                <strong>${match.awayTeam}</strong>
+
+                <br><br>
+
+                ${match.date}
+
+                à
+
+                ${match.time}
+
+            </div>
+        `;
+
+    });
 
 }
