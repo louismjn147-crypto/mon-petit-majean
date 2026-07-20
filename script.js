@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
             stage: "Phase de ligue",
             date: "Mardi 17 septembre",
             time: "21h00",
+            kickoff: "2025-09-17T21:00:00",
             homeTeam: "Manchester City",
             homeLogo: "logos/manchester.jpg",
             awayTeam: "Inter Milan",
@@ -46,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             stage: "Phase de ligue",
             date: "Mardi 17 septembre",
             time: "21h00",
+            kickoff: "2025-09-17T21:00:00",
             homeTeam: "RC Lens",
             homeLogo: "logos/rclens.jpg",
             awayTeam: "Real Madrid",
@@ -63,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             stage: "Phase de ligue",
             date: "Mercredi 18 septembre",
             time: "21h00",
+            kickoff: "2025-09-17T21:00:00",
             homeTeam: "Bayern Munich",
             homeLogo: "logos/munich.jpg",
             awayTeam: "Arsenal",
@@ -71,23 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 home: 190,
                 draw: 335,
                 away: 265
-            },
-            finalScore: null
-        },
-        {
-            id: "barca-dortmund",
-            competition: "Ligue des champions",
-            stage: "Phase de ligue",
-            date: "Mercredi 18 septembre",
-            time: "21h00",
-            homeTeam: "FC Barcelone",
-            homeShort: "BAR",
-            awayTeam: "Dortmund",
-            awayShort: "BVB",
-            odds: {
-                home: 160,
-                draw: 350,
-                away: 380
             },
             finalScore: null
         }
