@@ -1,20 +1,27 @@
 :root {
-    --bg: #07090f;
-    --bg-soft: #0d1018;
-    --panel: #111722;
-    --panel-soft: #151d2b;
-    --panel-strong: #0c1320;
+    --bg-main: #020617;
+    --bg-deep: #01030d;
+    --bg-card: rgba(9, 19, 49, 0.94);
+    --bg-card-soft: rgba(13, 27, 66, 0.86);
+
+    --blue: #1f6fff;
+    --blue-light: #70b7ff;
+    --blue-pale: #c8ddff;
+    --purple: #6f4cff;
+    --silver: #d8e2f3;
+
+    --green: #2bd698;
+    --red: #ff6478;
+    --gold: #ffd56a;
+
     --text: #ffffff;
-    --muted: #939db2;
-    --line: rgba(255, 255, 255, 0.08);
-    --line-strong: rgba(255, 255, 255, 0.14);
-    --blue: #2d7cff;
-    --purple: #7755ff;
-    --blue-light: #7db7ff;
-    --gold: #d6aa21;
-    --green: #2fd29b;
-    --red: #ff687d;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+    --muted: #91a1c5;
+
+    --border: rgba(132, 161, 230, 0.18);
+    --border-strong: rgba(126, 171, 255, 0.38);
+
+    --shadow:
+        0 22px 55px rgba(0, 0, 0, 0.38);
 }
 
 * {
@@ -32,9 +39,24 @@ body {
     overflow-x: hidden;
     color: var(--text);
     background:
-        radial-gradient(circle at 50% -15%, rgba(48, 89, 194, 0.18), transparent 32%),
-        linear-gradient(180deg, #0a0c12 0%, #07090f 100%);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        radial-gradient(
+            circle at 50% -10%,
+            rgba(42, 91, 255, 0.28),
+            transparent 38%
+        ),
+        linear-gradient(
+            180deg,
+            var(--bg-main) 0%,
+            var(--bg-deep) 100%
+        );
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
 body,
@@ -43,41 +65,101 @@ input {
     font: inherit;
 }
 
-a {
-    color: inherit;
-    text-decoration: none;
+button,
+input {
+    border: none;
 }
 
 button,
-input {
-    border: 0;
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
 }
 
 button {
     color: inherit;
 }
 
+/* =========================
+   FOND LIGUE DES CHAMPIONS
+========================= */
+
 .page-background {
     position: fixed;
     inset: 0;
-    z-index: -10;
+    z-index: -5;
+    overflow: hidden;
     pointer-events: none;
 }
 
-.background-glow,
-.stars-layer {
-    display: none;
+.background-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.35;
 }
 
-/* HEADER COMPACT TYPE APPLICATION */
+.background-glow-left {
+    top: 120px;
+    left: -170px;
+    width: 420px;
+    height: 420px;
+    background: #195eff;
+}
+
+.background-glow-right {
+    top: 520px;
+    right: -180px;
+    width: 430px;
+    height: 430px;
+    background: #6338ff;
+}
+
+.stars-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0.48;
+    background-image:
+        radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.8) 1px,
+            transparent 1px
+        ),
+        radial-gradient(
+            circle,
+            rgba(115, 172, 255, 0.7) 1px,
+            transparent 1px
+        );
+    background-position:
+        0 0,
+        25px 25px;
+    background-size:
+        64px 64px,
+        86px 86px;
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black 0%,
+            rgba(0, 0, 0, 0.8) 55%,
+            transparent 100%
+        );
+}
+
+/* =========================
+   HEADER
+========================= */
 
 .site-header {
     position: sticky;
     top: 0;
     z-index: 100;
-    padding: 14px 0 10px;
-    background: rgba(7, 9, 15, 0.92);
-    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(2, 6, 23, 0.84);
+    backdrop-filter: blur(20px);
 }
 
 .header-inner {
@@ -85,125 +167,289 @@ button {
     align-items: center;
     justify-content: space-between;
     width: min(1120px, calc(100% - 32px));
-    min-height: 58px;
+    min-height: 72px;
     margin: 0 auto;
-    padding: 7px 10px;
-    border: 1px solid var(--line-strong);
-    border-radius: 17px;
-    background: rgba(24, 25, 29, 0.96);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
 }
 
-.brand,
-.header-player {
+.brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .brand-emblem {
     display: grid;
     place-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--blue), var(--purple));
-    box-shadow: 0 7px 18px rgba(62, 104, 255, 0.28);
-    font-size: 0.8rem;
-}
-
-.brand-copy {
-    display: flex;
-    flex-direction: column;
-}
-
-.brand-copy small {
-    color: var(--muted);
-    font-size: 0.52rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
-.brand-copy strong {
-    margin-top: 2px;
-    font-size: 0.82rem;
-}
-
-.header-player {
-    padding: 5px 9px 5px 5px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: #11151d;
-}
-
-.player-avatar {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--blue), var(--purple));
-    font-size: 0.68rem;
-    font-weight: 900;
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #8bc8ff,
+            #246eff 42%,
+            #5338d8 100%
+        );
+    box-shadow:
+        0 8px 24px rgba(34, 105, 255, 0.38);
+    font-size: 1rem;
 }
 
+.brand-copy,
 .player-copy {
     display: flex;
     flex-direction: column;
 }
 
+.brand-copy small,
 .player-copy small {
     color: var(--muted);
-    font-size: 0.48rem;
-    font-weight: 700;
+    font-size: 0.59rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
     text-transform: uppercase;
+}
+
+.brand-copy strong {
+    margin-top: 2px;
+    font-size: 0.95rem;
+}
+
+.header-player {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 12px 7px 7px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(12, 24, 57, 0.78);
+}
+
+.player-avatar {
+    display: grid;
+    place-items: center;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            var(--purple)
+        );
+    font-size: 0.76rem;
+    font-weight: 900;
 }
 
 .player-copy strong {
     margin-top: 1px;
-    font-size: 0.67rem;
+    font-size: 0.78rem;
 }
 
-/* PAGE */
+/* =========================
+   PAGE PRINCIPALE
+========================= */
 
 .site-main {
     width: min(1120px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 12px 0 70px;
+    padding: 34px 0 75px;
 }
 
-/* ON CACHE LE GROS HERO MAIS ON GARDE LE HTML */
+/* =========================
+   HERO
+========================= */
 
 .hero {
-    display: none;
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 235px;
+    align-items: center;
+    gap: 30px;
+    min-height: 330px;
+    padding: 42px;
+    overflow: hidden;
+    border: 1px solid rgba(133, 172, 255, 0.25);
+    border-radius: 28px;
+    background:
+        radial-gradient(
+            circle at 90% 8%,
+            rgba(110, 73, 255, 0.4),
+            transparent 33%
+        ),
+        radial-gradient(
+            circle at 5% 95%,
+            rgba(22, 105, 255, 0.33),
+            transparent 38%
+        ),
+        linear-gradient(
+            135deg,
+            rgba(12, 38, 102, 0.98),
+            rgba(16, 12, 66, 0.98)
+        );
+    box-shadow: var(--shadow);
 }
 
-/* NAVIGATION COMPACTE */
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: 190px;
+    width: 230px;
+    height: 230px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
 
-.main-tabs {
-    position: sticky;
-    top: 84px;
-    z-index: 90;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-    margin: 4px 0 34px;
-    padding: 5px;
-    border: 1px solid var(--line);
-    border-radius: 13px;
-    background: rgba(20, 22, 27, 0.94);
+.hero::after {
+    content: "★";
+    position: absolute;
+    right: 28px;
+    bottom: -76px;
+    color: rgba(255, 255, 255, 0.035);
+    font-size: 15rem;
+    line-height: 1;
+}
+
+.hero-content,
+.hero-panel {
+    position: relative;
+    z-index: 1;
+}
+
+.section-kicker {
+    color: var(--blue-light);
+    font-size: 0.63rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    max-width: 670px;
+    margin-top: 12px;
+    font-size: clamp(2.3rem, 5vw, 4.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+}
+
+.hero h1 span {
+    display: block;
+    margin-top: 8px;
+    color: var(--blue-pale);
+}
+
+.hero-text {
+    max-width: 610px;
+    margin-top: 20px;
+    color: #c3cdeb;
+    font-size: 0.94rem;
+    line-height: 1.75;
+}
+
+.hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 26px;
+    padding: 13px 20px;
+    border-radius: 10px;
+    background:
+        linear-gradient(
+            105deg,
+            #1975ff,
+            #6948ff
+        );
+    box-shadow:
+        0 12px 30px rgba(40, 91, 255, 0.33);
+    font-size: 0.76rem;
+    font-weight: 900;
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+}
+
+.hero-button:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+}
+
+.hero-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 215px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 22px;
+    background: rgba(3, 10, 32, 0.48);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(16px);
 }
 
+.hero-panel-label,
+.hero-panel-note {
+    color: var(--muted);
+    font-size: 0.63rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.hero-panel-rank {
+    margin: 12px 0 3px;
+    font-size: 4.1rem;
+    line-height: 1;
+}
+
+.hero-panel-score {
+    color: var(--blue-light);
+    font-size: 0.77rem;
+    font-weight: 900;
+}
+
+.hero-panel-line {
+    width: 100%;
+    height: 1px;
+    margin: 18px 0;
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            rgba(255, 255, 255, 0.17),
+            transparent
+        );
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.main-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 22px 0 46px;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(7, 15, 38, 0.82);
+    backdrop-filter: blur(17px);
+}
+
 .main-tab {
-    padding: 10px 12px;
+    padding: 11px 12px;
     border-radius: 9px;
     color: var(--muted);
     text-align: center;
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     font-weight: 800;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
 }
 
 .main-tab:hover {
@@ -213,71 +459,74 @@ button {
 
 .main-tab.active {
     color: white;
-    background: #24262b;
-    box-shadow: inset 0 0 0 1px rgba(214, 170, 33, 0.45);
+    background:
+        linear-gradient(
+            105deg,
+            var(--blue),
+            var(--purple)
+        );
+    box-shadow:
+        0 7px 18px rgba(39, 87, 255, 0.23);
 }
 
-/* TITRES */
+/* =========================
+   SECTIONS
+========================= */
 
 .page-section {
-    margin-top: 44px;
-    scroll-margin-top: 145px;
-}
-
-.page-section:first-of-type {
-    margin-top: 0;
+    scroll-margin-top: 100px;
+    margin-top: 54px;
 }
 
 .section-header {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 14px;
-}
-
-.section-kicker {
-    color: var(--blue-light);
-    font-size: 0.58rem;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    gap: 20px;
+    margin-bottom: 18px;
 }
 
 .section-header h2 {
-    margin-top: 4px;
-    font-size: 1.35rem;
+    margin-top: 5px;
+    font-size: 1.55rem;
     letter-spacing: -0.035em;
 }
 
 .section-counter {
-    padding: 5px 9px;
-    border: 1px solid var(--line);
+    padding: 6px 10px;
+    border: 1px solid var(--border);
     border-radius: 999px;
-    color: var(--muted);
-    background: #12161f;
-    font-size: 0.56rem;
-    font-weight: 800;
+    color: var(--blue-light);
+    background: rgba(32, 99, 224, 0.12);
+    font-size: 0.62rem;
+    font-weight: 900;
 }
 
-/* CARTES PRONOSTICS - CONSERVÉES ET AMÉLIORÉES */
+/* =========================
+   CARTES DE MATCH
+========================= */
 
 .matches-container {
     display: grid;
-    gap: 12px;
+    gap: 14px;
 }
 
 .match-card {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 17px;
+    padding: 18px;
     overflow: hidden;
-    border: 1px solid rgba(80, 119, 205, 0.18);
-    border-radius: 14px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
     background:
-        linear-gradient(145deg, rgba(16, 31, 70, 0.98), rgba(7, 16, 39, 0.99));
-    box-shadow: var(--shadow);
+        linear-gradient(
+            145deg,
+            rgba(15, 29, 68, 0.98),
+            rgba(6, 14, 36, 0.99)
+        );
+    box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.24);
 }
 
 .match-card-header,
@@ -287,7 +536,8 @@ button {
     justify-content: space-between;
     gap: 14px;
     width: 100%;
-    padding-bottom: 12px;
+    padding-bottom: 13px;
+    margin-bottom: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
@@ -296,27 +546,28 @@ button {
     align-items: center;
     gap: 7px;
     color: var(--blue-light);
-    font-size: 0.58rem;
+    font-size: 0.60rem;
     font-weight: 900;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
 }
 
 .champions-star {
     display: grid;
     place-items: center;
-    width: 17px;
-    height: 17px;
-    border: 1px solid rgba(125, 175, 255, 0.3);
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(125, 175, 255, 0.30);
     border-radius: 50%;
     color: white;
     background: rgba(37, 101, 224, 0.16);
-    font-size: 0.5rem;
+    font-size: 0.52rem;
 }
 
 .match-time {
+    flex-shrink: 0;
     color: var(--muted);
-    font-size: 0.59rem;
+    font-size: 0.61rem;
     text-align: right;
 }
 
@@ -326,7 +577,7 @@ button {
     align-items: start;
     gap: 18px;
     width: 100%;
-    margin-top: 18px;
+    margin-top: 20px;
 }
 
 .pronostic-team {
@@ -341,14 +592,14 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
+    gap: 10px;
     min-width: 0;
 }
 
 .pronostic-team-name strong {
     min-width: 0;
     overflow: hidden;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     line-height: 1.25;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -358,33 +609,38 @@ button {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid rgba(130, 170, 255, 0.28);
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(130, 170, 255, 0.30);
     border-radius: 50%;
-    color: #d7e7ff;
-    background: radial-gradient(circle at 35% 25%, rgba(68, 132, 255, 0.34), rgba(10, 24, 59, 0.92));
-    font-size: 0.56rem;
+    color: var(--blue-pale);
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            rgba(68, 132, 255, 0.34),
+            rgba(10, 24, 59, 0.92)
+        );
+    font-size: 0.58rem;
     font-weight: 900;
 }
 
 .pronostic-team-points {
-    margin-top: 7px;
-    padding: 4px 8px;
-    border: 1px solid rgba(86, 144, 255, 0.18);
+    margin-top: 8px;
+    padding: 5px 9px;
+    border: 1px solid rgba(86, 144, 255, 0.20);
     border-radius: 999px;
     color: var(--blue-light);
-    background: rgba(40, 103, 224, 0.09);
-    font-size: 0.54rem;
+    background: rgba(40, 103, 224, 0.10);
+    font-size: 0.56rem;
     font-weight: 900;
 }
 
 .teams-versus {
     align-self: center;
     margin-top: 12px;
-    color: rgba(255, 255, 255, 0.34);
+    color: rgba(255, 255, 255, 0.36);
     text-align: center;
-    font-size: 0.53rem;
+    font-size: 0.56rem;
     font-weight: 900;
     letter-spacing: 0.08em;
 }
@@ -393,21 +649,28 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: min(100%, 290px);
-    margin: 20px auto 0;
-    padding: 15px 17px;
-    border: 1px solid rgba(112, 165, 255, 0.26);
-    border-radius: 13px;
-    background: linear-gradient(145deg, rgba(17, 35, 80, 0.86), rgba(5, 13, 35, 0.94));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 28px rgba(0, 0, 0, 0.18);
+    width: min(100%, 300px);
+    margin: 22px auto 0;
+    padding: 16px 18px;
+    border: 1px solid rgba(112, 165, 255, 0.28);
+    border-radius: 14px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17, 35, 80, 0.86),
+            rgba(5, 13, 35, 0.94)
+        );
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 12px 28px rgba(0, 0, 0, 0.18);
 }
 
 .prediction-label {
     margin-bottom: 8px;
-    color: #d4e4ff;
-    font-size: 0.56rem;
+    color: var(--blue-pale);
+    font-size: 0.58rem;
     font-weight: 900;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
 }
 
@@ -422,18 +685,27 @@ button {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: textfield;
-    width: 52px;
-    height: 44px;
+    width: 55px;
+    height: 46px;
     padding: 0;
-    border: 1px solid rgba(113, 159, 255, 0.44);
-    border-radius: 8px;
+    border: 1px solid rgba(113, 159, 255, 0.45);
+    border-radius: 9px;
     outline: none;
     color: white;
-    background: linear-gradient(180deg, #1b294f, #0b1229);
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.42);
+    background:
+        linear-gradient(
+            180deg,
+            #1b294f,
+            #0b1229
+        );
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.42);
     text-align: center;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 900;
+    transition:
+        border 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .score-input::-webkit-inner-spin-button,
@@ -445,12 +717,14 @@ button {
 
 .score-input:focus {
     border-color: var(--blue-light);
-    box-shadow: 0 0 0 3px rgba(69, 137, 255, 0.14), inset 0 2px 6px rgba(0, 0, 0, 0.35);
+    box-shadow:
+        0 0 0 3px rgba(69, 137, 255, 0.15),
+        inset 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 .score-separator {
     color: rgba(255, 255, 255, 0.72);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 900;
 }
 
@@ -459,7 +733,7 @@ button {
     margin-top: 7px;
     color: var(--blue-light);
     text-align: center;
-    font-size: 0.52rem;
+    font-size: 0.54rem;
     font-weight: 800;
 }
 
@@ -472,8 +746,8 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 26px;
-    margin-top: 14px;
+    gap: 28px;
+    margin-top: 15px;
 }
 
 .reward-information {
@@ -481,7 +755,7 @@ button {
     align-items: center;
     gap: 6px;
     color: var(--muted);
-    font-size: 0.55rem;
+    font-size: 0.57rem;
 }
 
 .reward-information strong {
@@ -493,19 +767,27 @@ button {
     min-width: 200px;
     margin-top: 14px;
     padding: 10px 18px;
-    border-radius: 8px;
-    background: linear-gradient(105deg, var(--blue), var(--purple));
-    box-shadow: 0 8px 20px rgba(48, 85, 255, 0.2);
+    border-radius: 9px;
+    background:
+        linear-gradient(
+            105deg,
+            var(--blue),
+            var(--purple)
+        );
+    box-shadow:
+        0 8px 20px rgba(48, 85, 255, 0.22);
     cursor: pointer;
-    font-size: 0.62rem;
+    font-size: 0.64rem;
     font-weight: 900;
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
 }
 
 .save-prediction-button:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
 }
-
-/* PRONOSTICS ENREGISTRÉS */
 
 .match-content {
     display: grid;
@@ -539,7 +821,7 @@ button {
 .team-name {
     min-width: 0;
     overflow: hidden;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -548,11 +830,11 @@ button {
 .team-odds {
     flex: 0 0 auto;
     padding: 4px 7px;
-    border: 1px solid rgba(72, 136, 255, 0.2);
+    border: 1px solid rgba(72, 136, 255, 0.22);
     border-radius: 7px;
     color: var(--blue-light);
-    background: rgba(39, 99, 210, 0.08);
-    font-size: 0.54rem;
+    background: rgba(39, 99, 210, 0.09);
+    font-size: 0.56rem;
     font-weight: 900;
 }
 
@@ -571,36 +853,11 @@ button {
     gap: 5px;
 }
 
-.saved-score {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-}
-
-.saved-score span {
-    display: grid;
-    place-items: center;
-    width: 42px;
-    height: 38px;
-    border: 1px solid rgba(113, 159, 255, 0.42);
-    border-radius: 8px;
-    background: linear-gradient(180deg, #1b294f, #0b1229);
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.42);
-    font-size: 0.92rem;
-    font-weight: 900;
-}
-
-.saved-score strong {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.8rem;
-}
-
 .saved-prediction-footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 13px;
     margin-top: 14px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.055);
@@ -611,11 +868,47 @@ button {
     align-items: center;
     gap: 5px;
     color: var(--muted);
-    font-size: 0.55rem;
+    font-size: 0.57rem;
 }
 
 .saved-points-information strong {
     color: var(--blue-light);
+}
+
+
+/* =========================
+   PRONOSTIC SAUVEGARDÉ
+========================= */
+
+.saved-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.saved-score span {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 39px;
+    border: 1px solid rgba(113, 159, 255, 0.42);
+    border-radius: 8px;
+    background:
+        linear-gradient(
+            180deg,
+            #1b294f,
+            #0b1229
+        );
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.42);
+    font-size: 0.95rem;
+    font-weight: 900;
+}
+
+.saved-score strong {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.82rem;
 }
 
 .result-status {
@@ -624,7 +917,7 @@ button {
     gap: 6px;
     padding: 7px 10px;
     border-radius: 8px;
-    font-size: 0.55rem;
+    font-size: 0.57rem;
     font-weight: 800;
 }
 
@@ -640,7 +933,7 @@ button {
 
 .result-correct {
     color: #cce1ff;
-    background: rgba(31,  111, 255, 0.15);
+    background: rgba(31, 111, 255, 0.15);
 }
 
 .result-wrong {
@@ -650,16 +943,23 @@ button {
 
 .edit-prediction-button {
     padding: 7px 12px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--muted);
     background: transparent;
     cursor: pointer;
-    font-size: 0.56rem;
+    font-size: 0.58rem;
     font-weight: 800;
 }
 
-/* MES PRONOS */
+.edit-prediction-button:hover {
+    color: white;
+    border-color: var(--border-strong);
+}
+
+/* =========================
+   MES PRONOSTICS
+========================= */
 
 .predictions-container {
     display: grid;
@@ -668,13 +968,13 @@ button {
 
 .prediction-summary {
     display: grid;
-    grid-template-columns: 125px minmax(0, 1fr) 145px;
+    grid-template-columns: 135px minmax(0, 1fr) 150px;
     align-items: center;
-    gap: 16px;
-    padding: 14px 16px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--panel);
+    gap: 18px;
+    padding: 15px 17px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg-card);
 }
 
 .prediction-summary-date {
@@ -684,21 +984,21 @@ button {
 
 .prediction-summary-date span {
     color: var(--blue-light);
-    font-size: 0.58rem;
+    font-size: 0.61rem;
     font-weight: 900;
 }
 
 .prediction-summary-date small {
     margin-top: 3px;
     color: var(--muted);
-    font-size: 0.54rem;
+    font-size: 0.57rem;
 }
 
 .prediction-summary-match {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 52px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 55px minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .summary-team {
@@ -717,31 +1017,31 @@ button {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
-    width: 27px;
-    height: 27px;
-    border: 1px solid rgba(127, 169, 255, 0.22);
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(127, 169, 255, 0.25);
     border-radius: 50%;
     color: var(--blue-light);
-    background: rgba(43, 105, 221, 0.09);
-    font-size: 0.46rem;
+    background: rgba(43, 105, 221, 0.1);
+    font-size: 0.48rem;
     font-weight: 900;
 }
 
 .summary-team strong {
     min-width: 0;
     overflow: hidden;
-    font-size: 0.66rem;
+    font-size: 0.69rem;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .summary-score {
     padding: 7px 8px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 7px;
-    background: #0b1019;
+    background: rgba(3, 9, 27, 0.62);
     text-align: center;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 900;
 }
 
@@ -754,31 +1054,33 @@ button {
 
 .prediction-summary-points strong {
     color: var(--blue-light);
-    font-size: 0.64rem;
+    font-size: 0.67rem;
 }
 
 .prediction-summary-points span {
     margin-top: 3px;
     color: var(--muted);
-    font-size: 0.53rem;
+    font-size: 0.55rem;
 }
 
-/* CLASSEMENT */
+/* =========================
+   CLASSEMENT
+========================= */
 
 .ranking-board {
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--bg-card);
 }
 
 .ranking-entry {
     display: grid;
-    grid-template-columns: 32px 30px minmax(0, 1fr) auto;
+    grid-template-columns: 34px 34px minmax(0, 1fr) auto;
     align-items: center;
     gap: 10px;
-    padding: 13px 15px;
-    border-bottom: 1px solid var(--line);
+    padding: 14px 17px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
 }
 
 .ranking-entry:last-child {
@@ -786,16 +1088,26 @@ button {
 }
 
 .ranking-entry-gold {
-    background: linear-gradient(90deg, rgba(214, 170, 33, 0.11), transparent 55%);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255, 213, 106, 0.11),
+            transparent 55%
+        );
 }
 
 .ranking-entry-current {
-    background: rgba(45, 124, 255, 0.08);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(31, 111, 255, 0.19),
+            rgba(111, 76, 255, 0.09)
+        );
 }
 
 .ranking-position {
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     font-weight: 900;
 }
 
@@ -806,7 +1118,7 @@ button {
 
 .ranking-icon {
     color: var(--blue-light);
-    font-size: 0.8rem;
+    font-size: 0.86rem;
 }
 
 .ranking-person {
@@ -815,41 +1127,50 @@ button {
 }
 
 .ranking-person strong {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
 }
 
 .ranking-person span {
     margin-top: 3px;
     color: var(--muted);
-    font-size: 0.53rem;
+    font-size: 0.56rem;
 }
 
 .ranking-points {
     color: var(--blue-light);
-    font-size: 0.67rem;
+    font-size: 0.7rem;
 }
 
-/* PROFIL */
+/* =========================
+   PROFIL
+========================= */
 
 .profile-panel {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 15px;
-    padding: 16px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--panel);
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--bg-card);
 }
 
 .profile-avatar {
     display: grid;
     place-items: center;
-    width: 45px;
-    height: 45px;
+    width: 49px;
+    height: 49px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--blue), var(--purple));
-    font-size: 0.82rem;
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            var(--purple)
+        );
+    box-shadow:
+        0 9px 24px rgba(44, 88, 255, 0.25);
+    font-size: 0.86rem;
     font-weight: 900;
 }
 
@@ -859,13 +1180,13 @@ button {
 }
 
 .profile-identity strong {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
 }
 
 .profile-identity span {
     margin-top: 3px;
     color: var(--muted);
-    font-size: 0.58rem;
+    font-size: 0.62rem;
 }
 
 .profile-stat {
@@ -876,7 +1197,7 @@ button {
 
 .profile-stat span {
     color: var(--muted);
-    font-size: 0.52rem;
+    font-size: 0.55rem;
     font-weight: 800;
     text-transform: uppercase;
 }
@@ -884,52 +1205,73 @@ button {
 .profile-stat strong {
     margin-top: 3px;
     color: var(--blue-light);
-    font-size: 0.94rem;
+    font-size: 1rem;
 }
 
-/* MESSAGES */
+/* =========================
+   MESSAGES
+========================= */
 
 .loading-card,
 .empty-card {
-    padding: 22px;
-    border: 1px dashed var(--line-strong);
-    border-radius: 12px;
+    padding: 23px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
     color: var(--muted);
-    background: #0d121b;
+    background: rgba(7, 15, 38, 0.68);
     text-align: center;
-    font-size: 0.65rem;
+    font-size: 0.68rem;
 }
+
+/* =========================
+   FOOTER
+========================= */
 
 .site-footer {
-    padding: 26px 20px;
-    border-top: 1px solid var(--line);
+    padding: 28px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
     color: var(--muted);
     text-align: center;
-    font-size: 0.56rem;
+    font-size: 0.59rem;
 }
 
-/* TABLETTE */
+/* =========================
+   TABLETTE
+========================= */
 
 @media (max-width: 850px) {
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-panel {
+        min-height: 160px;
+    }
+
+    .match-content {
+        grid-template-columns:
+            minmax(0, 1fr)
+            125px
+            minmax(0, 1fr);
+        gap: 10px;
+    }
+
     .prediction-summary {
-        grid-template-columns: 105px minmax(0, 1fr);
+        grid-template-columns: 110px minmax(0, 1fr);
     }
 
     .prediction-summary-points {
         grid-column: 1 / -1;
         align-items: flex-start;
-        padding-top: 9px;
-        border-top: 1px solid var(--line);
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.055);
         text-align: left;
-    }
-
-    .match-content {
-        grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
-        gap: 10px;
     }
 }
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 650px) {
     .header-inner,
@@ -937,29 +1279,173 @@ button {
         width: min(100% - 20px, 1120px);
     }
 
-    .site-header {
-        padding-top: 10px;
-    }
-
     .brand-copy small,
     .player-copy small {
         display: none;
     }
 
+    .site-main {
+        padding-top: 20px;
+    }
+
+    .hero {
+        min-height: auto;
+        padding: 28px 20px;
+        border-radius: 21px;
+    }
+
+    .hero h1 {
+        font-size: 2.35rem;
+    }
+
+    .hero-text {
+        font-size: 0.82rem;
+    }
+
     .main-tabs {
-        top: 75px;
         grid-template-columns: repeat(2, 1fr);
-        margin-bottom: 28px;
     }
 
     .section-header h2 {
-        font-size: 1.2rem;
+        font-size: 1.32rem;
     }
 
     .match-card {
-        padding: 14px 12px;
+        padding: 13px 10px;
     }
 
+    .match-topline {
+        align-items: flex-start;
+    }
+
+    .match-time {
+        max-width: 135px;
+        text-align: right;
+    }
+
+    .match-content {
+        grid-template-columns:
+            minmax(0, 1fr)
+            102px
+            minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .match-team {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .match-team-home,
+    .match-team-away {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .match-team-home .team-badge,
+    .match-team-home .team-name,
+    .match-team-home .team-odds {
+        order: initial;
+    }
+
+    .team-badge {
+        width: 34px;
+        height: 34px;
+        font-size: 0.52rem;
+    }
+
+    .team-name {
+        max-width: 100%;
+        font-size: 0.64rem;
+        white-space: normal;
+    }
+
+    .team-odds {
+        padding: 3px 5px;
+        font-size: 0.5rem;
+    }
+
+    .score-input {
+        width: 39px;
+        height: 36px;
+        font-size: 0.87rem;
+    }
+
+    .prediction-label,
+    .prediction-points {
+        font-size: 0.47rem;
+    }
+
+    .match-footer,
+    .saved-prediction-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .save-prediction-button {
+        width: 100%;
+        margin-top: 3px;
+    }
+
+    .prediction-summary {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .prediction-summary-date {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .prediction-summary-date small {
+        margin-top: 0;
+    }
+
+    .prediction-summary-match {
+        grid-template-columns:
+            minmax(0, 1fr)
+            48px
+            minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    .summary-team {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .summary-team-away {
+        justify-content: center;
+    }
+
+    .summary-team strong {
+        font-size: 0.59rem;
+        white-space: normal;
+    }
+
+    .prediction-summary-points {
+        grid-column: auto;
+    }
+
+    .ranking-entry {
+        grid-template-columns:
+            24px
+            25px
+            minmax(0, 1fr)
+            auto;
+        padding: 12px 10px;
+    }
+
+    .ranking-points {
+        font-size: 0.61rem;
+    }
+}
+
+
+/* Adaptation mobile des nouvelles cartes */
+
+@media (max-width: 650px) {
     .match-card-header,
     .match-topline {
         align-items: flex-start;
@@ -993,32 +1479,27 @@ button {
         white-space: normal;
     }
 
-    .team-badge {
-        width: 35px;
-        height: 35px;
-        font-size: 0.5rem;
-    }
-
     .pronostic-team-points {
         margin-top: 6px;
         padding: 3px 6px;
-        font-size: 0.47rem;
+        font-size: 0.48rem;
     }
 
     .teams-versus {
-        margin-top: 22px;
-        font-size: 0.45rem;
+        margin-top: 23px;
+        font-size: 0.47rem;
     }
 
     .prediction-box {
-        width: min(100%, 238px);
-        margin-top: 16px;
+        width: min(100%, 240px);
+        margin-top: 17px;
         padding: 13px;
     }
 
     .prediction-box .score-input {
-        width: 47px;
-        height: 40px;
+        width: 48px;
+        height: 41px;
+        font-size: 1rem;
     }
 
     .match-rewards {
@@ -1029,98 +1510,17 @@ button {
         flex-direction: column;
         gap: 2px;
         text-align: center;
-        font-size: 0.5rem;
+        font-size: 0.52rem;
     }
 
-    .save-prediction-button {
+    .match-card > .save-prediction-button {
         width: 100%;
     }
-
-    .match-content {
-        grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1fr);
-        gap: 6px;
-    }
-
-    .match-team {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .match-team-home,
-    .match-team-away {
-        justify-content: center;
-        text-align: center;
-    }
-
-    .match-team-home .team-badge,
-    .match-team-home .team-name,
-    .match-team-home .team-odds {
-        order: initial;
-    }
-
-    .team-name {
-        max-width: 100%;
-        font-size: 0.62rem;
-        white-space: normal;
-    }
-
-    .team-odds {
-        padding: 3px 5px;
-        font-size: 0.48rem;
-    }
-
-    .saved-prediction-footer {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .prediction-summary {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .prediction-summary-date {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .prediction-summary-date small {
-        margin-top: 0;
-    }
-
-    .prediction-summary-match {
-        grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
-        gap: 7px;
-    }
-
-    .summary-team {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .summary-team-away {
-        justify-content: center;
-    }
-
-    .summary-team strong {
-        font-size: 0.57rem;
-        white-space: normal;
-    }
-
-    .prediction-summary-points {
-        grid-column: auto;
-    }
-
-    .ranking-entry {
-        grid-template-columns: 23px 24px minmax(0, 1fr) auto;
-        padding: 11px 9px;
-    }
-
-    .ranking-points {
-        font-size: 0.59rem;
-    }
 }
+
+/* =========================
+   PETITS MOBILES
+========================= */
 
 @media (max-width: 420px) {
     .player-copy {
@@ -1128,11 +1528,18 @@ button {
     }
 
     .header-player {
-        padding: 5px;
+        padding: 6px;
+    }
+
+    .hero h1 {
+        font-size: 1.95rem;
     }
 
     .match-content {
-        grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1fr);
+        grid-template-columns:
+            minmax(0, 1fr)
+            92px
+            minmax(0, 1fr);
     }
 
     .score-input {
@@ -1143,5 +1550,11 @@ button {
     .saved-score span {
         width: 35px;
         height: 34px;
+    }
+
+    .draw-information,
+    .bonus-information,
+    .saved-points-information {
+        font-size: 0.51rem;
     }
 }
