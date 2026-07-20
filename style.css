@@ -1374,10 +1374,11 @@ button {
     .saved-points-information {
         font-size: 0.51rem;
     }
-   .team-logo{
-    width:42px;
-    height:42px;
-    object-fit:contain;
-    display:block;
-    flex-shrink:0;
+   .team-logo {
+    width: 42px !important;
+    height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    object-fit: contain;
+    display: block;
 }
