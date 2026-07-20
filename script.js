@@ -1,19 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const EXACT_SCORE_BONUS = 150;
 
-    /*
-     * Pour saisir le résultat réel plus tard :
-     *
-     * actualScore: null
-     *
-     * devient par exemple :
-     *
-     * actualScore: {
-     *     home: 2,
-     *     away: 1
-     * }
-     */
-
     const matches = [
         {
             id: 1,
@@ -144,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return {
                 status: "pending",
                 points: null,
-                message: "En attente du résultat"
+                message: "Résultat en attente"
             };
         }
 
@@ -168,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 points:
                     match.odds[actualOutcome] +
                     EXACT_SCORE_BONUS,
-                message: `Score exact : +${EXACT_SCORE_BONUS} pts de bonus`
+                message: "Score exact"
             };
         }
 
@@ -206,44 +193,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     : null;
 
                 return `
-                    <article class="match-card">
-                        <div class="match-top">
-                            <div>
-                                <p class="competition">
-                                    Ligue des champions
-                                </p>
+                    <article class="match-card compact-match-card">
 
-                                <h3 class="teams">
-                                    ${match.home} - ${match.away}
-                                </h3>
-                            </div>
+                        <div class="compact-match-header">
+                            <span class="competition">
+                                Ligue des champions
+                            </span>
 
-                            <p class="match-date">
+                            <span class="compact-match-date">
                                 ${match.date}
-                            </p>
-                        </div>
-
-                        <div class="odds-grid">
-                            <div class="odd-box">
-                                <span>${match.home}</span>
-                                <strong>
-                                    ${match.odds.home} pts
-                                </strong>
-                            </div>
-
-                            <div class="odd-box">
-                                <span>Match nul</span>
-                                <strong>
-                                    ${match.odds.draw} pts
-                                </strong>
-                            </div>
-
-                            <div class="odd-box">
-                                <span>${match.away}</span>
-                                <strong>
-                                    ${match.odds.away} pts
-                                </strong>
-                            </div>
+                            </span>
                         </div>
 
                         ${
@@ -255,6 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 )
                                 : renderScoreForm(match)
                         }
+
                     </article>
                 `;
             })
@@ -266,65 +226,93 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderScoreForm(match) {
         return `
-            <div class="score-prediction">
-                <p class="score-instruction">
-                    Entre ton score exact
-                </p>
+            <div class="compact-score-form">
 
-                <div class="score-inputs">
-                    <div class="score-team">
-                        <label for="home-score-${match.id}">
+                <div class="compact-teams-row">
+
+                    <div class="compact-team compact-home-team">
+                        <strong>
                             ${match.home}
-                        </label>
+                        </strong>
 
-                        <input
-                            id="home-score-${match.id}"
-                            class="score-input"
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            placeholder="0"
-                            data-home-score="${match.id}"
-                        >
+                        <span class="compact-odd">
+                            ${match.odds.home} pts
+                        </span>
                     </div>
 
-                    <span class="score-separator">
-                        -
-                    </span>
+                    <div class="compact-score-center">
+                        <div class="compact-score-inputs">
 
-                    <div class="score-team">
-                        <label for="away-score-${match.id}">
+                            <input
+                                id="home-score-${match.id}"
+                                class="compact-score-input"
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                placeholder="0"
+                                data-home-score="${match.id}"
+                                aria-label="Score de ${match.home}"
+                            >
+
+                            <span class="compact-score-separator">
+                                -
+                            </span>
+
+                            <input
+                                id="away-score-${match.id}"
+                                class="compact-score-input"
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                placeholder="0"
+                                data-away-score="${match.id}"
+                                aria-label="Score de ${match.away}"
+                            >
+
+                        </div>
+
+                        <span class="exact-score-bonus">
+                            Score exact : +${EXACT_SCORE_BONUS} pts
+                        </span>
+                    </div>
+
+                    <div class="compact-team compact-away-team">
+                        <strong>
                             ${match.away}
-                        </label>
+                        </strong>
 
-                        <input
-                            id="away-score-${match.id}"
-                            class="score-input"
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            placeholder="0"
-                            data-away-score="${match.id}"
-                        >
+                        <span class="compact-odd">
+                            ${match.odds.away} pts
+                        </span>
                     </div>
+
+                </div>
+
+                <div class="compact-draw-line">
+                    <span>Match nul</span>
+
+                    <strong>
+                        ${match.odds.draw} pts
+                    </strong>
                 </div>
 
                 <p
-                    class="potential-points"
+                    class="potential-points compact-potential-points"
                     id="potential-points-${match.id}"
                 >
-                    Saisis un score pour voir les points possibles.
+                    Entre ton score pour voir les points possibles.
                 </p>
 
                 <button
                     type="button"
-                    class="validate-button"
+                    class="validate-button compact-validate-button"
                     data-save-score="${match.id}"
                 >
-                    Valider mon score
+                    Valider mon pronostic
                 </button>
+
             </div>
         `;
     }
@@ -338,58 +326,81 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (result.status === "pending") {
             resultHtml = `
-                <div class="prediction-status pending">
+                <div class="compact-result pending">
                     Résultat en attente
                 </div>
             `;
         } else {
             resultHtml = `
-                <div class="prediction-result ${result.status}">
-                    <span>${result.message}</span>
+                <div class="compact-result ${result.status}">
+                    <span>
+                        ${result.message}
+                    </span>
 
                     <strong>
-                        ${result.points} pts gagnés
+                        ${result.points} pts
                     </strong>
                 </div>
             `;
         }
 
         return `
-            <div class="saved-score-box">
-                <p class="saved-score-label">
-                    Ton pronostic
-                </p>
+            <div class="compact-saved-prediction">
 
-                <div class="saved-score">
-                    <span>${match.home}</span>
+                <div class="compact-teams-row">
 
-                    <strong>
-                        ${prediction.homeScore}
-                        -
-                        ${prediction.awayScore}
-                    </strong>
+                    <div class="compact-team compact-home-team">
+                        <strong>
+                            ${match.home}
+                        </strong>
 
-                    <span>${match.away}</span>
+                        <span class="compact-odd">
+                            ${match.odds.home} pts
+                        </span>
+                    </div>
+
+                    <div class="compact-saved-score">
+                        <strong>
+                            ${prediction.homeScore}
+                            -
+                            ${prediction.awayScore}
+                        </strong>
+
+                        <span>
+                            Mon pronostic
+                        </span>
+                    </div>
+
+                    <div class="compact-team compact-away-team">
+                        <strong>
+                            ${match.away}
+                        </strong>
+
+                        <span class="compact-odd">
+                            ${match.odds.away} pts
+                        </span>
+                    </div>
+
                 </div>
 
-                <p class="saved-outcome">
-                    ${getOutcomeLabel(
-                        match,
-                        prediction.outcome
-                    )}
-                    —
-                    ${prediction.basePoints}
-                    pts possibles
-                </p>
+                <div class="compact-saved-information">
+                    <span>
+                        ${getOutcomeLabel(
+                            match,
+                            prediction.outcome
+                        )}
+                    </span>
 
-                <p class="exact-bonus-information">
+                    <strong>
+                        ${prediction.basePoints} pts
+                    </strong>
+                </div>
+
+                <div class="compact-exact-information">
                     Score exact :
-                    ${prediction.basePoints}
-                    + ${EXACT_SCORE_BONUS}
-                    =
                     ${prediction.basePoints + EXACT_SCORE_BONUS}
-                    pts
-                </p>
+                    pts possibles
+                </div>
 
                 ${resultHtml}
 
@@ -399,13 +410,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         : `
                             <button
                                 type="button"
-                                class="delete-prediction-button"
+                                class="delete-prediction-button compact-edit-button"
                                 data-delete-score="${match.id}"
                             >
-                                Modifier mon pronostic
+                                Modifier
                             </button>
                         `
                 }
+
             </div>
         `;
     }
@@ -454,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     awayValue === ""
                 ) {
                     information.textContent =
-                        "Saisis un score pour voir les points possibles.";
+                        "Entre ton score pour voir les points possibles.";
 
                     return;
                 }
@@ -466,10 +478,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     !Number.isInteger(homeScore) ||
                     !Number.isInteger(awayScore) ||
                     homeScore < 0 ||
-                    awayScore < 0
+                    awayScore < 0 ||
+                    homeScore > 20 ||
+                    awayScore > 20
                 ) {
                     information.textContent =
-                        "Le score doit contenir des nombres entiers positifs.";
+                        "Entre un score valide entre 0 et 20.";
 
                     return;
                 }
@@ -490,9 +504,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 information.innerHTML = `
                     Bon résultat :
-                    <strong>${basePoints} pts</strong>
+                    <strong>
+                        ${basePoints} pts
+                    </strong>
 
-                    <br>
+                    &nbsp;•&nbsp;
 
                     Score exact :
                     <strong>
@@ -566,7 +582,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (!match) {
-            alert("Ce match est introuvable.");
+            alert(
+                "Ce match est introuvable."
+            );
+
             return;
         }
 
@@ -659,6 +678,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 return `
                     <article class="prediction-card">
+
                         <div>
                             <strong>
                                 ${match.home}
@@ -676,15 +696,24 @@ document.addEventListener("DOMContentLoaded", function () {
                             </p>
 
                             <p>
+                                Bon résultat :
+                                ${prediction.basePoints} pts
+                            </p>
+
+                            <p>
                                 Score exact :
-                                ${prediction.basePoints + EXACT_SCORE_BONUS}
-                                pts possibles
+                                ${
+                                    prediction.basePoints +
+                                    EXACT_SCORE_BONUS
+                                }
+                                pts
                             </p>
                         </div>
 
                         <span class="prediction-points">
                             ${pointsText}
                         </span>
+
                     </article>
                 `;
             })
