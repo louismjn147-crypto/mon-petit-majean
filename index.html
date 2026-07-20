@@ -10,118 +10,129 @@
 
     <meta
         name="description"
-        content="Jeu privé de pronostics sur la Ligue des champions."
+        content="Mon Petit Majean, jeu privé de pronostics sur la Ligue des champions."
     >
 
     <title>Mon Petit Majean</title>
 
-    <link
-        rel="stylesheet"
-        href="./style.css?v=62"
-    >
+    <link rel="stylesheet" href="./style.css?v=61">
 </head>
 
 <body>
 
-    <div class="background-stars"></div>
+    <div class="page-background" aria-hidden="true">
+        <div class="background-glow background-glow-left"></div>
+        <div class="background-glow background-glow-right"></div>
+        <div class="stars-layer"></div>
+    </div>
 
-    <header class="topbar">
-        <div class="topbar-content">
+    <header class="site-header">
 
-            <a href="#accueil" class="brand">
-                <span class="brand-logo">★</span>
+        <div class="header-inner">
 
-                <span class="brand-text">
-                    <small>Compétition privée</small>
+            <a class="brand" href="#matchs">
+                <span class="brand-emblem">
+                    ★
+                </span>
+
+                <span class="brand-copy">
+                    <small>Ligue des champions</small>
                     <strong>Mon Petit Majean</strong>
                 </span>
             </a>
 
-            <div class="player-chip">
-                <span class="player-avatar">L</span>
+            <div class="header-player">
+                <span class="player-avatar">
+                    L
+                </span>
 
-                <span class="player-information">
+                <span class="player-copy">
                     <small>Joueur</small>
                     <strong>Louis</strong>
                 </span>
             </div>
 
         </div>
+
     </header>
 
-    <main class="page">
+    <main class="site-main">
 
-        <section id="accueil" class="hero-section">
+        <section class="hero">
 
-            <div class="hero-copy">
-                <p class="eyebrow">
-                    Ligue des champions
+            <div class="hero-content">
+
+                <p class="section-kicker">
+                    Soirées européennes
                 </p>
 
                 <h1>
-                    Pronostique les scores.
-                    <span>Domine le classement.</span>
+                    Pronostique la
+                    <span>Ligue des champions</span>
                 </h1>
 
-                <p class="hero-description">
+                <p class="hero-text">
                     Trouve le bon résultat pour gagner les points
-                    de la cote. Trouve le score exact et ajoute
-                    150 points de bonus.
+                    de la cote. Trouve le score exact et décroche
+                    150 points supplémentaires.
                 </p>
 
-                <a href="#matches" class="primary-button">
+                <a class="hero-button" href="#matchs">
                     Faire mes pronostics
                 </a>
+
             </div>
 
-            <aside class="hero-ranking-card">
-                <p>Ton classement</p>
+            <div class="hero-panel">
 
-                <strong>#2</strong>
+                <span class="hero-panel-label">
+                    Ma performance
+                </span>
 
-                <span>2 210 points</span>
-            </aside>
+                <strong class="hero-panel-rank">
+                    #2
+                </strong>
+
+                <span class="hero-panel-score">
+                    2 210 points
+                </span>
+
+                <div class="hero-panel-line"></div>
+
+                <span class="hero-panel-note">
+                    11 bons pronostics
+                </span>
+
+            </div>
 
         </section>
 
-        <nav class="main-navigation">
+        <nav class="main-tabs" aria-label="Navigation principale">
 
-            <a
-                href="#matches"
-                class="navigation-link active"
-            >
+            <a class="main-tab active" href="#matchs">
                 Matchs
             </a>
 
-            <a
-                href="#mes-pronos"
-                class="navigation-link"
-            >
+            <a class="main-tab" href="#mes-pronos">
                 Mes pronos
             </a>
 
-            <a
-                href="#classement"
-                class="navigation-link"
-            >
+            <a class="main-tab" href="#classement">
                 Classement
             </a>
 
-            <a
-                href="#profil"
-                class="navigation-link"
-            >
+            <a class="main-tab" href="#profil">
                 Profil
             </a>
 
         </nav>
 
-        <section id="matches" class="content-section">
+        <section id="matchs" class="page-section">
 
-            <div class="section-heading">
+            <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">
+                    <p class="section-kicker">
                         Prochaine journée
                     </p>
 
@@ -130,33 +141,30 @@
                     </h2>
                 </div>
 
-                <span class="section-badge">
-                    3 matchs
+                <span class="section-counter" id="match-count">
+                    0 match
                 </span>
 
             </div>
 
             <div
                 id="matches-container"
-                class="matches-list"
+                class="matches-container"
             >
-                <p class="loading-message">
+                <div class="loading-card">
                     Chargement des matchs…
-                </p>
+                </div>
             </div>
 
         </section>
 
-        <section
-            id="mes-pronos"
-            class="content-section"
-        >
+        <section id="mes-pronos" class="page-section">
 
-            <div class="section-heading">
+            <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">
-                        Tes choix
+                    <p class="section-kicker">
+                        Mes choix
                     </p>
 
                     <h2>
@@ -168,120 +176,107 @@
 
             <div
                 id="my-predictions-container"
-                class="predictions-list"
+                class="predictions-container"
             >
-                <p class="empty-message">
-                    Aucun pronostic enregistré pour le moment.
-                </p>
+                <div class="empty-card">
+                    Aucun pronostic enregistré.
+                </div>
             </div>
 
         </section>
 
-        <section
-            id="classement"
-            class="content-section"
-        >
+        <section id="classement" class="page-section">
 
-            <div class="section-heading">
+            <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">
-                        Classement général
+                    <p class="section-kicker">
+                        Ligue privée
                     </p>
 
                     <h2>
-                        Top joueurs
+                        Classement général
                     </h2>
                 </div>
 
-                <button
-                    type="button"
-                    class="secondary-button"
-                >
-                    Voir tout
-                </button>
-
             </div>
 
-            <div class="ranking-card">
+            <div class="ranking-board">
 
-                <div class="ranking-row first-place">
+                <article class="ranking-entry ranking-entry-gold">
 
                     <span class="ranking-position">
                         1
                     </span>
 
-                    <span class="ranking-medal">
-                        🏆
+                    <span class="ranking-icon">
+                        ★
                     </span>
 
-                    <div class="ranking-player">
+                    <div class="ranking-person">
                         <strong>Thomas</strong>
                         <span>12 bons pronostics</span>
                     </div>
 
-                    <strong class="ranking-score">
+                    <strong class="ranking-points">
                         2 450 pts
                     </strong>
 
-                </div>
+                </article>
 
-                <div class="ranking-row current-player">
+                <article class="ranking-entry ranking-entry-current">
 
                     <span class="ranking-position">
                         2
                     </span>
 
-                    <span class="ranking-medal">
-                        ⭐
+                    <span class="ranking-icon">
+                        ★
                     </span>
 
-                    <div class="ranking-player">
+                    <div class="ranking-person">
                         <strong>Louis</strong>
                         <span>11 bons pronostics</span>
                     </div>
 
-                    <strong class="ranking-score">
+                    <strong class="ranking-points">
                         2 210 pts
                     </strong>
 
-                </div>
+                </article>
 
-                <div class="ranking-row">
+                <article class="ranking-entry">
 
                     <span class="ranking-position">
                         3
                     </span>
 
-                    <span class="ranking-medal">
-                        🥉
+                    <span class="ranking-icon">
+                        ★
                     </span>
 
-                    <div class="ranking-player">
+                    <div class="ranking-person">
                         <strong>Hugo</strong>
                         <span>9 bons pronostics</span>
                     </div>
 
-                    <strong class="ranking-score">
+                    <strong class="ranking-points">
                         1 980 pts
                     </strong>
 
-                </div>
+                </article>
 
             </div>
 
         </section>
 
-        <section
-            id="profil"
-            class="content-section"
-        >
+        <section id="profil" class="page-section">
 
-            <div class="section-heading">
+            <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">
-                        Compte joueur
+                    <p class="section-kicker">
+                        Mon compte
                     </p>
 
                     <h2>
@@ -291,13 +286,13 @@
 
             </div>
 
-            <div class="profile-card">
+            <article class="profile-panel">
 
-                <span class="profile-large-avatar">
+                <span class="profile-avatar">
                     L
                 </span>
 
-                <div class="profile-details">
+                <div class="profile-identity">
                     <strong>Louis</strong>
                     <span>Joueur de la ligue privée</span>
                 </div>
@@ -307,19 +302,19 @@
                     <strong>2 210</strong>
                 </div>
 
-            </div>
+            </article>
 
         </section>
 
     </main>
 
-    <footer class="footer">
+    <footer class="site-footer">
         <p>
-            Jeu privé de pronostics — aucun argent réel
+            Jeu privé de pronostics, sans argent réel.
         </p>
     </footer>
 
-    <script src="./script.js?v=22"></script>
+    <script src="./script.js?v=20"></script>
 
 </body>
 </html>
