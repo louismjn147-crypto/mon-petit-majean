@@ -1,4 +1,4 @@
-const PASSWORD = "Loulou2003?";
+const PASSWORD = "Majean2025";
 
 const loginButton = document.getElementById("login-admin");
 const passwordInput = document.getElementById("admin-password");
