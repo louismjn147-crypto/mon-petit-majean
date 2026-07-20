@@ -27,3 +27,24 @@ function login() {
     }
 
 }
+const addMatchButton = document.getElementById("add-match");
+
+addMatchButton.addEventListener("click", function () {
+
+    const homeTeam = document.getElementById("home-team").value;
+    const awayTeam = document.getElementById("away-team").value;
+    const matchDate = document.getElementById("match-date").value;
+    const matchTime = document.getElementById("match-time").value;
+
+    alert(
+        "Match créé :\n\n" +
+        homeTeam +
+        " - " +
+        awayTeam +
+        "\n" +
+        matchDate +
+        " " +
+        matchTime
+    );
+
+});
