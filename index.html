@@ -1,64 +1,142 @@
 <!DOCTYPE html>
-
 <html lang="fr">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Mon Prono</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Champions Prono</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
+<div class="stars"></div>
 
-<h1>🏆 Mon Prono</h1>
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">★</div>
 
-<p>Bienvenue sur ton application de pronostics</p>
+        <div>
+            <p class="brand-small">Compétition privée</p>
+            <h1>Champions Prono</h1>
+        </div>
+    </div>
 
+    <div class="profile">
+        <span class="profile-avatar">L</span>
 
-<h2>⚽ Match du jour</h2>
+        <div>
+            <span class="profile-label">Joueur</span>
+            <strong>Louis</strong>
+        </div>
+    </div>
+</header>
 
+<main class="page">
 
-<div>
+    <section class="hero">
+        <div class="hero-content">
+            <p class="hero-kicker">Saison 2026-2027</p>
 
-<h3>PSG - OM</h3>
+            <h2>
+                La Ligue des champions<br>
+                entre proches
+            </h2>
 
-<p>PSG : 175 points</p>
+            <p class="hero-text">
+                Pronostique les affiches, marque les points liés aux cotes
+                et prends la tête du classement.
+            </p>
 
-<p>Nul : 340 points</p>
+            <a href="#matches" class="hero-button">
+                Faire mes pronostics
+            </a>
+        </div>
 
-<p>OM : 450 points</p>
+        <div class="hero-card">
+            <p>Ton classement</p>
+            <strong class="hero-position">#2</strong>
+            <span>2 210 points</span>
+        </div>
+    </section>
 
+    <nav class="menu">
+        <button class="menu-button active">Matchs</button>
+        <button class="menu-button">Classement</button>
+        <button class="menu-button">Mes pronos</button>
+        <button class="menu-button">Profil</button>
+    </nav>
 
-<button>
-Pronostiquer
-</button>
+    <section id="matches">
+        <div class="section-header">
+            <div>
+                <p class="section-kicker">Journée européenne</p>
+                <h2>Matchs à pronostiquer</h2>
+            </div>
 
+            <span class="round-badge">
+                3 matchs
+            </span>
+        </div>
 
-</div>
+        <div id="matches-container"></div>
+    </section>
 
+    <section class="ranking-section">
+        <div class="section-header">
+            <div>
+                <p class="section-kicker">Classement général</p>
+                <h2>Top joueurs</h2>
+            </div>
 
-<h2>🏆 Classement</h2>
+            <button class="link-button">Voir tout</button>
+        </div>
 
+        <div class="ranking-card">
+            <div class="ranking-line first">
+                <span class="rank">1</span>
+                <span class="medal">🏆</span>
 
-<ol>
+                <div class="ranking-player">
+                    <strong>Thomas</strong>
+                    <span>12 bons pronostics</span>
+                </div>
 
-<li>Thomas - 2450 points</li>
+                <strong class="ranking-points">2 450 pts</strong>
+            </div>
 
-<li>Lucas - 2210 points</li>
+            <div class="ranking-line current">
+                <span class="rank">2</span>
+                <span class="medal">⭐</span>
 
-<li>Hugo - 1980 points</li>
+                <div class="ranking-player">
+                    <strong>Louis</strong>
+                    <span>11 bons pronostics</span>
+                </div>
 
-</ol>
+                <strong class="ranking-points">2 210 pts</strong>
+            </div>
 
+            <div class="ranking-line">
+                <span class="rank">3</span>
+                <span class="medal">🥉</span>
+
+                <div class="ranking-player">
+                    <strong>Hugo</strong>
+                    <span>9 bons pronostics</span>
+                </div>
+
+                <strong class="ranking-points">1 980 pts</strong>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    Jeu privé de pronostics — aucun argent réel
+</footer>
+
+<script src="script.js"></script>
 
 </body>
-
 </html>
