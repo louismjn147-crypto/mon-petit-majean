@@ -14,7 +14,6 @@ passwordInput.addEventListener("keydown", function (event) {
 });
 
 function login() {
-
     if (passwordInput.value !== PASSWORD) {
         alert("Mot de passe incorrect.");
         return;
@@ -28,15 +27,24 @@ function login() {
 }
 
 function initialiseAdmin() {
-
     const boutonAjouter = document.getElementById("add-match");
 
     boutonAjouter.onclick = function () {
+        const domicile = document
+            .getElementById("home-team")
+            .value.trim();
 
-        const domicile = document.getElementById("home-team").value.trim();
-        const exterieur = document.getElementById("away-team").value.trim();
-        const date = document.getElementById("match-date").value;
-        const heure = document.getElementById("match-time").value;
+        const exterieur = document
+            .getElementById("away-team")
+            .value.trim();
+
+        const date = document
+            .getElementById("match-date")
+            .value;
+
+        const heure = document
+            .getElementById("match-time")
+            .value;
 
         if (
             domicile === "" ||
@@ -49,80 +57,42 @@ function initialiseAdmin() {
         }
 
         const nouveauMatch = {
-    homeTeam: domicile,
-    awayTeam: exterieur,
-    date: date,
-    time: heure
-};
+            homeTeam: domicile,
+            awayTeam: exterieur,
+            date: date,
+            time: heure
+        };
 
-let matchs = JSON.parse(localStorage.getItem("adminMatches")) || [];
+        const matchs =
+            JSON.parse(localStorage.getItem("adminMatches")) || [];
 
-matchs.push(nouveauMatch);
+        matchs.push(nouveauMatch);
 
-localStorage.setItem("adminMatches", JSON.stringify(matchs));
+        localStorage.setItem(
+            "adminMatches",
+            JSON.stringify(matchs)
+        );
 
-afficherMatchs();
+        afficherMatchs();
 
-alert("✅ Match enregistré !");
+        document.getElementById("home-team").value = "";
+        document.getElementById("away-team").value = "";
+        document.getElementById("match-date").value = "";
+        document.getElementById("match-time").value = "";
 
-document.getElementById("home-team").value = "";
-document.getElementById("away-team").value = "";
-document.getElementById("match-date").value = "";
-document.getElementById("match-time").value = "";
-
+        alert("✅ Match enregistré !");
     };
-
 }
 
 function afficherMatchs() {
-
     const liste = document.getElementById("matches-list");
 
-    const matchs =
-        JSON.parse(localStorage.getItem("adminMatches")) || [];
-
-    if (matchs.length === 0) {
-
-        liste.innerHTML = "<p>Aucun match enregistré.</p>";
-
+    if (!liste) {
+        console.error(
+            'Le bloc <div id="matches-list"></div> est introuvable.'
+        );
         return;
     }
-
-    liste.innerHTML = "";
-
-    matchs.forEach(function(match, index) {
-
-        liste.innerHTML += `
-    <div style="
-        background:#243244;
-        padding:15px;
-        border-radius:10px;
-        margin-bottom:10px;
-    ">
-
-        <strong>${match.homeTeam}</strong>
-        -
-        <strong>${match.awayTeam}</strong>
-
-        <br><br>
-
-        ${match.date} à ${match.time}
-
-        <br><br>
-
-        <button onclick="supprimerMatch(${index})">
-            🗑️ Supprimer
-        </button>
-
-    </div>
-`;
-
-    });
-
-}
-function afficherMatchs() {
-
-    const liste = document.getElementById("matches-list");
 
     const matchs =
         JSON.parse(localStorage.getItem("adminMatches")) || [];
@@ -134,44 +104,63 @@ function afficherMatchs() {
 
     liste.innerHTML = "";
 
-    matchs.forEach(function(match, index) {
+    matchs.forEach(function (match, index) {
+        const carte = document.createElement("div");
 
-        liste.innerHTML += `
-            <div style="
-                background:#243244;
-                padding:15px;
-                border-radius:10px;
-                margin-bottom:10px;
-            ">
+        carte.style.background = "#243244";
+        carte.style.padding = "15px";
+        carte.style.borderRadius = "10px";
+        carte.style.marginBottom = "10px";
 
-                <strong>${match.homeTeam}</strong>
-                -
-                <strong>${match.awayTeam}</strong>
+        carte.innerHTML = `
+            <strong>${match.homeTeam}</strong>
+            -
+            <strong>${match.awayTeam}</strong>
 
-                <br><br>
+            <br><br>
 
-                ${match.date} à ${match.time}
+            ${match.date} à ${match.time}
 
-                <br><br>
+            <br><br>
 
-                <button class="delete-match-button" data-index="${index}">
-                    🗑️ Supprimer
-                </button>
-
-            </div>
+            <button
+                type="button"
+                class="delete-match-button"
+                data-index="${index}"
+            >
+                🗑️ Supprimer
+            </button>
         `;
+
+        liste.appendChild(carte);
     });
 
     const boutonsSupprimer =
         document.querySelectorAll(".delete-match-button");
 
-    boutonsSupprimer.forEach(function(bouton) {
-
-        bouton.addEventListener("click", function() {
-
+    boutonsSupprimer.forEach(function (bouton) {
+        bouton.addEventListener("click", function () {
             const index = Number(bouton.dataset.index);
 
             supprimerMatch(index);
         });
     });
+}
+
+function supprimerMatch(index) {
+    const matchs =
+        JSON.parse(localStorage.getItem("adminMatches")) || [];
+
+    if (!confirm("Veux-tu vraiment supprimer ce match ?")) {
+        return;
+    }
+
+    matchs.splice(index, 1);
+
+    localStorage.setItem(
+        "adminMatches",
+        JSON.stringify(matchs)
+    );
+
+    afficherMatchs();
 }
