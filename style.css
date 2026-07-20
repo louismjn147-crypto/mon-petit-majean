@@ -736,4 +736,244 @@ footer {
     .saved-score {
         gap: 8px;
     }
+
+    .compact-match-card {
+    max-width: 760px;
+    margin: 0 auto 18px;
+    padding: 16px 18px;
+}
+
+.compact-match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.compact-match-date {
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.compact-teams-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 22px;
+}
+
+.compact-team {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.compact-team strong {
+    font-size: 1rem;
+    color: white;
+}
+
+.compact-home-team {
+    text-align: right;
+    align-items: flex-end;
+}
+
+.compact-away-team {
+    text-align: left;
+    align-items: flex-start;
+}
+
+.compact-odd {
+    padding: 4px 9px;
+    border: 1px solid rgba(76, 137, 255, 0.25);
+    border-radius: 999px;
+    color: var(--light-blue);
+    background: rgba(31, 91, 221, 0.09);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.compact-score-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.compact-score-inputs {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.compact-score-input {
+    width: 52px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgba(91, 143, 255, 0.35);
+    border-radius: 9px;
+    outline: none;
+    text-align: center;
+    color: white;
+    background: rgba(3, 12, 33, 0.95);
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.compact-score-input:focus {
+    border-color: var(--light-blue);
+    box-shadow: 0 0 0 3px rgba(66, 130, 255, 0.12);
+}
+
+.compact-score-separator {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.exact-score-bonus {
+    color: var(--muted);
+    font-size: 0.65rem;
+    white-space: nowrap;
+}
+
+.compact-draw-line {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    color: var(--muted);
+    font-size: 0.75rem;
+}
+
+.compact-draw-line strong {
+    color: var(--light-blue);
+}
+
+.compact-potential-points {
+    min-height: auto;
+    margin: 12px 0;
+    font-size: 0.78rem;
+}
+
+.compact-validate-button {
+    display: block;
+    width: auto;
+    min-width: 210px;
+    margin: 0 auto;
+    padding: 10px 24px;
+}
+
+.compact-saved-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.compact-saved-score strong {
+    min-width: 82px;
+    padding: 8px 12px;
+    border: 1px solid rgba(91, 143, 255, 0.35);
+    border-radius: 9px;
+    text-align: center;
+    color: white;
+    background: rgba(3, 12, 33, 0.95);
+    font-size: 1.3rem;
+}
+
+.compact-saved-score span {
+    color: var(--muted);
+    font-size: 0.65rem;
+}
+
+.compact-saved-information {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 15px;
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.compact-saved-information strong {
+    color: var(--light-blue);
+}
+
+.compact-exact-information {
+    margin-top: 7px;
+    text-align: center;
+    color: var(--light-blue);
+    font-size: 0.74rem;
+}
+
+.compact-result {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    max-width: 360px;
+    margin: 13px auto 0;
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: 0.75rem;
+}
+
+.compact-result.pending {
+    justify-content: center;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.compact-result.exact {
+    background: rgba(38, 201, 126, 0.14);
+}
+
+.compact-result.correct {
+    background: rgba(52, 132, 255, 0.14);
+}
+
+.compact-result.wrong {
+    background: rgba(255, 77, 100, 0.14);
+}
+
+.compact-edit-button {
+    display: block;
+    width: auto;
+    margin: 12px auto 0;
+    padding: 7px 18px;
+}
+
+@media (max-width: 650px) {
+    .compact-match-card {
+        padding: 14px 10px;
+    }
+
+    .compact-teams-row {
+        grid-template-columns: 1fr auto 1fr;
+        gap: 8px;
+    }
+
+    .compact-team strong {
+        font-size: 0.78rem;
+    }
+
+    .compact-odd {
+        padding: 3px 6px;
+        font-size: 0.62rem;
+    }
+
+    .compact-score-input {
+        width: 42px;
+        height: 40px;
+    }
+
+    .exact-score-bonus {
+        font-size: 0.55rem;
+    }
+
+    .compact-validate-button {
+        width: 100%;
+        min-width: 0;
+    }
 }
