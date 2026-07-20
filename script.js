@@ -235,60 +235,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderMatches() {
-        if (!matchesContainer) {
-            return;
-        }
-
-        if (matchCount) {
-            matchCount.textContent =
-                `${matches.length} matchs`;
-        }
-
-        matchesContainer.innerHTML = matches
-            .map((match) => {
-                const prediction = predictions[match.id];
-
-                return `
-                    <article class="match-card">
-
-                        <div class="match-topline">
-
-                            <div class="match-context">
-                                <span class="champions-star">
-                                    ★
-                                </span>
-
-                                <span>
-                                    ${escapeHtml(match.stage)}
-                                </span>
-                            </div>
-
-                            <time class="match-time">
-                                ${escapeHtml(match.date)}
-                                ·
-                                ${escapeHtml(match.time)}
-                            </time>
-
-                        </div>
-
-                        ${
-                            prediction
-                                ? renderSavedPrediction(
-                                    match,
-                                    prediction
-                                )
-                                : renderPredictionForm(match)
-                        }
-
-                    </article>
-                `;
-            })
-            .join("");
-
-        bindPredictionInputs();
-        bindSaveButtons();
-        bindEditButtons();
+    if (!matchesContainer) {
+        return;
     }
+
+    if (matchCount) {
+        matchCount.textContent = `${matches.length} matchs`;
+    }
+
+    matchesContainer.innerHTML = matches
+        .map((match) => {
+            const prediction = predictions[match.id];
+
+            return `
+                <article class="match-card">
+                    ${
+                        prediction
+                            ? renderSavedPrediction(
+                                match,
+                                prediction
+                            )
+                            : renderPredictionForm(match)
+                    }
+                </article>
+            `;
+        })
+        .join("");
+
+    bindPredictionInputs();
+    bindSaveButtons();
+    bindEditButtons();
+}
 
     function renderPredictionForm(match) {
     return `
