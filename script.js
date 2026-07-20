@@ -291,110 +291,131 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderPredictionForm(match) {
-        return `
-            <div class="match-content">
+    return `
+        <div class="match-card-header">
 
-                <div class="match-team match-team-home">
+            <div class="match-context">
+                <span class="champions-star">★</span>
+                <span>${escapeHtml(match.stage)}</span>
+            </div>
 
+            <time class="match-time">
+                ${escapeHtml(match.date)} · ${escapeHtml(match.time)}
+            </time>
+
+        </div>
+
+        <div class="teams-line">
+
+            <div class="pronostic-team">
+
+                <div class="pronostic-team-name">
                     <span class="team-badge">
                         ${escapeHtml(match.homeShort)}
                     </span>
 
-                    <strong class="team-name">
+                    <strong>
                         ${escapeHtml(match.homeTeam)}
                     </strong>
-
-                    <span class="team-odds">
-                        ${match.odds.home} pts
-                    </span>
-
                 </div>
 
-                <div class="prediction-center">
+                <span class="pronostic-team-points">
+                    Victoire : ${match.odds.home} pts
+                </span>
 
-                    <span class="prediction-label">
-                        Ton score
-                    </span>
+            </div>
 
-                    <div class="score-selector">
+            <span class="teams-versus">
+                VS
+            </span>
 
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            autocomplete="off"
-                            class="score-input"
-                            data-home-input="${escapeHtml(match.id)}"
-                            aria-label="Score de ${escapeHtml(match.homeTeam)}"
-                        >
+            <div class="pronostic-team">
 
-                        <span class="score-separator">
-                            -
-                        </span>
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            autocomplete="off"
-                            class="score-input"
-                            data-away-input="${escapeHtml(match.id)}"
-                            aria-label="Score de ${escapeHtml(match.awayTeam)}"
-                        >
-
-                    </div>
-
-                    <span
-                        class="prediction-points"
-                        id="prediction-points-${escapeHtml(match.id)}"
-                    >
-                        Entre ton pronostic
-                    </span>
-
-                </div>
-
-                <div class="match-team match-team-away">
-
+                <div class="pronostic-team-name">
                     <span class="team-badge">
                         ${escapeHtml(match.awayShort)}
                     </span>
 
-                    <strong class="team-name">
+                    <strong>
                         ${escapeHtml(match.awayTeam)}
                     </strong>
-
-                    <span class="team-odds">
-                        ${match.odds.away} pts
-                    </span>
-
                 </div>
+
+                <span class="pronostic-team-points">
+                    Victoire : ${match.odds.away} pts
+                </span>
 
             </div>
 
-            <div class="match-footer">
+        </div>
 
-                <div class="draw-information">
-                    <span>Match nul</span>
-                    <strong>${match.odds.draw} pts</strong>
-                </div>
+        <div class="prediction-box">
 
-                <div class="bonus-information">
-                    <span>Score exact</span>
-                    <strong>+${EXACT_SCORE_BONUS} pts</strong>
-                </div>
+            <span class="prediction-label">
+                Mon pronostic
+            </span>
 
-                <button
-                    type="button"
-                    class="save-prediction-button"
-                    data-save-match="${escapeHtml(match.id)}"
+            <div class="score-selector">
+
+                <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="score-input"
+                    data-home-input="${escapeHtml(match.id)}"
+                    aria-label="Score de ${escapeHtml(match.homeTeam)}"
                 >
-                    Valider
-                </button>
+
+                <span class="score-separator">
+                    -
+                </span>
+
+                <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="score-input"
+                    data-away-input="${escapeHtml(match.id)}"
+                    aria-label="Score de ${escapeHtml(match.awayTeam)}"
+                >
 
             </div>
-        `;
+
+            <span
+                class="prediction-points"
+                id="prediction-points-${escapeHtml(match.id)}"
+            >
+                Entre ton score
+            </span>
+
+        </div>
+
+        <div class="match-rewards">
+
+            <div class="reward-information">
+                <span>Match nul</span>
+                <strong>${match.odds.draw} pts</strong>
+            </div>
+
+            <div class="reward-information">
+                <span>Score exact</span>
+                <strong>+${EXACT_SCORE_BONUS} pts</strong>
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="save-prediction-button"
+            data-save-match="${escapeHtml(match.id)}"
+        >
+            Valider mon pronostic
+        </button>
+    `;
     }
 
     function renderSavedPrediction(match, prediction) {
