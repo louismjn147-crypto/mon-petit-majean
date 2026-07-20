@@ -868,7 +868,8 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMatches();
     renderMyPredictions();
     bindNavigationTabs();
-});
+}
+                          
 matches.push({
     id: "UCL 4",
     stage: "Phase de Ligue",
