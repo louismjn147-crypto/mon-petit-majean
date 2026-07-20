@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
             Time: "21h00",
             kickoff: "2025-09-17T21:00:00",
             homeTeam: "Paris SG",
-            homeLogo: "logos/psg.jpg",
+            homeLogo: "logos/psg.png",
             awayTeam: "Real Madrid",
             awayLogo: "logos/madrid.png",
             odds: {
