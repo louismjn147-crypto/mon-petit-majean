@@ -1,312 +1,260 @@
-const matches = [
-    {
-        id: 1,
-        competition: "Ligue des champions",
-        home: "Real Madrid",
-        away: "Manchester City",
-        date: "Mardi",
-        time: "21h00",
-        choices: [
-            {
-                value: "home",
-                label: "Real Madrid",
-                points: 210
-            },
-            {
-                value: "draw",
-                label: "Nul",
-                points: 360
-            },
-            {
-                value: "away",
-                label: "Manchester City",
-                points: 295
-            }
-        ]
-    },
-    {
-        id: 2,
-        competition: "Ligue des champions",
-        home: "Paris SG",
-        away: "Bayern Munich",
-        date: "Mardi",
-        time: "21h00",
-        choices: [
-            {
-                value: "home",
-                label: "Paris SG",
-                points: 245
-            },
-            {
-                value: "draw",
-                label: "Nul",
-                points: 350
-            },
-            {
-                value: "away",
-                label: "Bayern Munich",
-                points: 275
-            }
-        ]
-    },
-    {
-        id: 3,
-        competition: "Ligue des champions",
-        home: "Arsenal",
-        away: "Inter Milan",
-        date: "Mercredi",
-        time: "21h00",
-        choices: [
-            {
-                value: "home",
-                label: "Arsenal",
-                points: 185
-            },
-            {
-                value: "draw",
-                label: "Nul",
-                points: 370
-            },
-            {
-                value: "away",
-                label: "Inter Milan",
-                points: 410
-            }
-        ]
-    }
-];
-
-const matchesContainer = document.getElementById("matches-container");
-
-let selections = {};
-
-let savedPredictions = loadPredictions();
-
-function loadPredictions() {
-    try {
-        const storedPredictions = localStorage.getItem("predictions");
-
-        if (!storedPredictions) {
-            return {};
+document.addEventListener("DOMContentLoaded", function () {
+    const matches = [
+        {
+            id: 1,
+            home: "Real Madrid",
+            away: "Manchester City",
+            date: "Mardi 21h00",
+            choices: [
+                { value: "home", label: "Real Madrid", points: 210 },
+                { value: "draw", label: "Match nul", points: 360 },
+                { value: "away", label: "Manchester City", points: 295 }
+            ]
+        },
+        {
+            id: 2,
+            home: "Paris SG",
+            away: "Bayern Munich",
+            date: "Mardi 21h00",
+            choices: [
+                { value: "home", label: "Paris SG", points: 245 },
+                { value: "draw", label: "Match nul", points: 350 },
+                { value: "away", label: "Bayern Munich", points: 275 }
+            ]
+        },
+        {
+            id: 3,
+            home: "Arsenal",
+            away: "Inter Milan",
+            date: "Mercredi 21h00",
+            choices: [
+                { value: "home", label: "Arsenal", points: 185 },
+                { value: "draw", label: "Match nul", points: 370 },
+                { value: "away", label: "Inter Milan", points: 410 }
+            ]
         }
+    ];
 
-        return JSON.parse(storedPredictions);
-    } catch (error) {
-        console.error(
-            "Impossible de lire les pronostics enregistrés :",
-            error
-        );
+    const matchesContainer =
+        document.getElementById("matches-container");
 
-        return {};
-    }
-}
+    const predictionsContainer =
+        document.getElementById("my-predictions-container");
 
-function savePredictions() {
+    let currentSelections = {};
+
+    let savedPredictions = {};
+
     try {
+        savedPredictions =
+            JSON.parse(localStorage.getItem("predictions")) || {};
+    } catch (error) {
+        savedPredictions = {};
+    }
+
+    function savePredictions() {
         localStorage.setItem(
             "predictions",
             JSON.stringify(savedPredictions)
         );
-    } catch (error) {
-        console.error(
-            "Impossible d'enregistrer les pronostics :",
-            error
-        );
-
-        alert(
-            "Une erreur empêche l'enregistrement du pronostic."
-        );
-    }
-}
-
-function renderMatches() {
-    if (!matchesContainer) {
-        console.error(
-            'La zone avec l’identifiant "matches-container" est introuvable.'
-        );
-
-        return;
     }
 
-    matchesContainer.innerHTML = "";
+    function renderMatches() {
+        if (!matchesContainer) {
+            console.error(
+                "Erreur : matches-container est introuvable."
+            );
+            return;
+        }
 
-    matches.forEach((match) => {
-        const savedPrediction = savedPredictions[match.id];
+        matchesContainer.innerHTML = matches
+            .map(function (match) {
+                const savedPrediction =
+                    savedPredictions[match.id];
 
-        const card = document.createElement("article");
-        card.className = "match-card";
+                return `
+                    <article class="match-card">
+                        <div class="match-top">
+                            <div>
+                                <p class="competition">
+                                    Ligue des champions
+                                </p>
 
-        card.innerHTML = `
-            <div class="match-top">
-                <div>
-                    <p class="competition">
-                        ${match.competition}
-                    </p>
+                                <h3 class="teams">
+                                    ${match.home} - ${match.away}
+                                </h3>
+                            </div>
 
-                    <h3 class="teams">
-                        ${match.home} - ${match.away}
-                    </h3>
-                </div>
+                            <p class="match-date">
+                                ${match.date}
+                            </p>
+                        </div>
 
-                <p class="match-date">
-                    ${match.date}<br>
-                    <strong>${match.time}</strong>
-                </p>
-            </div>
+                        <div class="choices">
+                            ${match.choices
+                                .map(function (choice) {
+                                    const selected =
+                                        savedPrediction &&
+                                        savedPrediction.value ===
+                                            choice.value;
 
-            <div class="choices">
-                ${match.choices
-                    .map((choice) => {
-                        const isSavedChoice =
-                            savedPrediction &&
-                            savedPrediction.value === choice.value;
+                                    return `
+                                        <button
+                                            type="button"
+                                            class="choice ${
+                                                selected
+                                                    ? "selected"
+                                                    : ""
+                                            }"
+                                            data-match-id="${match.id}"
+                                            data-value="${choice.value}"
+                                            data-label="${choice.label}"
+                                            data-points="${choice.points}"
+                                            ${
+                                                savedPrediction
+                                                    ? "disabled"
+                                                    : ""
+                                            }
+                                        >
+                                            <span>
+                                                ${choice.label}
+                                            </span>
 
-                        return `
-                            <button
-                                type="button"
-                                class="choice ${
-                                    isSavedChoice ? "selected" : ""
-                                }"
-                                data-match="${match.id}"
-                                data-value="${choice.value}"
-                                data-label="${choice.label}"
-                                data-points="${choice.points}"
-                            >
-                                <span>${choice.label}</span>
+                                            <strong>
+                                                +${choice.points} pts
+                                            </strong>
+                                        </button>
+                                    `;
+                                })
+                                .join("")}
+                        </div>
 
-                                <span class="choice-points">
-                                    +${choice.points} pts
-                                </span>
-                            </button>
-                        `;
-                    })
-                    .join("")}
-            </div>
+                        <button
+                            type="button"
+                            class="validate-button"
+                            data-validate-id="${match.id}"
+                            ${
+                                savedPrediction
+                                    ? "disabled"
+                                    : ""
+                            }
+                        >
+                            ${
+                                savedPrediction
+                                    ? "Pronostic enregistré"
+                                    : "Valider mon pronostic"
+                            }
+                        </button>
 
-            <button
-                type="button"
-                class="validate-button"
-                data-validate="${match.id}"
-                ${savedPrediction ? "disabled" : ""}
-            >
-                ${
-                    savedPrediction
-                        ? "Pronostic enregistré"
-                        : "Valider mon pronostic"
+                        ${
+                            savedPrediction
+                                ? `
+                                    <p class="saved-message">
+                                        Ton choix :
+                                        <strong>
+                                            ${savedPrediction.label}
+                                        </strong>
+                                        — ${savedPrediction.points}
+                                        points possibles
+                                    </p>
+                                `
+                                : ""
+                        }
+                    </article>
+                `;
+            })
+            .join("");
+
+        addEvents();
+    }
+
+    function addEvents() {
+        const choices =
+            document.querySelectorAll(".choice");
+
+        choices.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const matchId =
+                    button.getAttribute("data-match-id");
+
+                if (savedPredictions[matchId]) {
+                    return;
                 }
-            </button>
 
-            ${
-                savedPrediction
-                    ? `
-                        <p class="saved-message">
-                            Ton choix :
-                            ${savedPrediction.label}
-                            —
-                            ${savedPrediction.points}
-                            points possibles
-                        </p>
-                    `
-                    : ""
-            }
-        `;
+                currentSelections[matchId] = {
+                    value: button.getAttribute("data-value"),
+                    label: button.getAttribute("data-label"),
+                    points: Number(
+                        button.getAttribute("data-points")
+                    )
+                };
 
-        matchesContainer.appendChild(card);
-    });
+                document
+                    .querySelectorAll(
+                        `[data-match-id="${matchId}"]`
+                    )
+                    .forEach(function (choiceButton) {
+                        choiceButton.classList.remove(
+                            "selected"
+                        );
+                    });
 
-    addPredictionEvents();
-    renderMyPredictions();
-}
+                button.classList.add("selected");
+            });
+        });
 
-function addPredictionEvents() {
-    const choiceButtons =
-        document.querySelectorAll(".choice");
+        const validateButtons =
+            document.querySelectorAll("[data-validate-id]");
 
-    choiceButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const matchId = button.dataset.match;
+        validateButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const matchId =
+                    button.getAttribute("data-validate-id");
 
-            if (savedPredictions[matchId]) {
-                return;
-            }
+                const selection =
+                    currentSelections[matchId];
 
-            selections[matchId] = {
-                value: button.dataset.value,
-                label: button.dataset.label,
-                points: Number(button.dataset.points)
-            };
-
-            document
-                .querySelectorAll(
-                    `[data-match="${matchId}"]`
-                )
-                .forEach((choiceButton) => {
-                    choiceButton.classList.remove(
-                        "selected"
+                if (!selection) {
+                    alert(
+                        "Choisis une équipe ou le match nul avant de valider."
                     );
+                    return;
+                }
+
+                savedPredictions[matchId] = selection;
+
+                savePredictions();
+
+                delete currentSelections[matchId];
+
+                renderMatches();
+                renderPredictions();
+            });
+        });
+    }
+
+    function renderPredictions() {
+        if (!predictionsContainer) {
+            return;
+        }
+
+        const entries =
+            Object.entries(savedPredictions);
+
+        if (entries.length === 0) {
+            predictionsContainer.innerHTML = `
+                <p class="empty-message">
+                    Aucun pronostic enregistré pour le moment.
+                </p>
+            `;
+            return;
+        }
+
+        predictionsContainer.innerHTML = entries
+            .map(function ([matchId, prediction]) {
+                const match = matches.find(function (item) {
+                    return item.id === Number(matchId);
                 });
-
-            button.classList.add("selected");
-        });
-    });
-
-    const validateButtons =
-        document.querySelectorAll("[data-validate]");
-
-    validateButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const matchId = button.dataset.validate;
-            const selection = selections[matchId];
-
-            if (!selection) {
-                alert(
-                    "Choisis d'abord un pronostic."
-                );
-
-                return;
-            }
-
-            savedPredictions[matchId] = selection;
-
-            savePredictions();
-
-            delete selections[matchId];
-
-            renderMatches();
-        });
-    });
-}
-
-function renderMyPredictions() {
-    const predictionsContainer =
-        document.getElementById(
-            "my-predictions-container"
-        );
-
-    if (!predictionsContainer) {
-        return;
-    }
-
-    const predictionEntries =
-        Object.entries(savedPredictions);
-
-    if (predictionEntries.length === 0) {
-        predictionsContainer.innerHTML = `
-            <p class="empty-message">
-                Aucun pronostic enregistré pour le moment.
-            </p>
-        `;
-
-        return;
-    }
-
-    predictionsContainer.innerHTML =
-        predictionEntries
-            .map(([matchId, prediction]) => {
-                const match = matches.find(
-                    (currentMatch) =>
-                        currentMatch.id === Number(matchId)
-                );
 
                 if (!match) {
                     return "";
@@ -326,13 +274,14 @@ function renderMyPredictions() {
                         </div>
 
                         <span class="prediction-points">
-                            ${prediction.points}
-                            pts possibles
+                            ${prediction.points} pts possibles
                         </span>
                     </article>
                 `;
             })
             .join("");
-}
+    }
 
-renderMatches();
+    renderMatches();
+    renderPredictions();
+});
