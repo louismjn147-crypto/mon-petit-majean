@@ -7,12 +7,25 @@ document.addEventListener("DOMContentLoaded", () => {
 let matches = [];
 let arreterEcouteMatchs = null;
 
+let firebaseAuthModule = null;
+let firebaseFirestoreModule = null;
+
+let firebaseAuth = null;
+let firebaseDb = null;
+
+let arreterEcoutePronostics = null;
+
 async function chargerMatchsFirebase() {
     try {
-        const [appModule, firestoreModule] = await Promise.all([
-            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
-        ]);
+        const [
+    appModule,
+    authModule,
+    firestoreModule
+] = await Promise.all([
+    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+]);
 
         const firebaseConfig = {
             apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
@@ -27,7 +40,32 @@ async function chargerMatchsFirebase() {
             ? appModule.getApp()
             : appModule.initializeApp(firebaseConfig);
 
-        const db = firestoreModule.getFirestore(app);
+        firebaseAuthModule = authModule;
+firebaseFirestoreModule = firestoreModule;
+
+firebaseAuth = authModule.getAuth(app);
+firebaseDb = firestoreModule.getFirestore(app);
+
+const db = firebaseDb;
+        authModule.onAuthStateChanged(
+    firebaseAuth,
+    function (utilisateur) {
+        if (!utilisateur) {
+            predictions = {};
+
+            if (arreterEcoutePronostics) {
+                arreterEcoutePronostics();
+                arreterEcoutePronostics = null;
+            }
+
+            renderMatches();
+            renderMyPredictions();
+            return;
+        }
+
+        ecouterPronosticsFirebase(utilisateur.uid);
+    }
+);
 
         const collectionMatchs =
             firestoreModule.collection(db, "matches");
@@ -235,55 +273,67 @@ async function chargerMatchsFirebase() {
 
     const matchCount = document.getElementById("match-count");
 
-    let predictions = loadPredictions();
+    let predictions = {};
 
-    function loadPredictions() {
-        try {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-
-            if (!savedData) {
-                return {};
-            }
-
-            const parsedData = JSON.parse(savedData);
-
-            if (
-                typeof parsedData !== "object" ||
-                parsedData === null ||
-                Array.isArray(parsedData)
-            ) {
-                return {};
-            }
-
-            return parsedData;
-        } catch (error) {
-            console.error(
-                "Erreur lors du chargement des pronostics :",
-                error
-            );
-
-            return {};
-        }
+function ecouterPronosticsFirebase(userId) {
+    if (
+        !firebaseFirestoreModule ||
+        !firebaseDb ||
+        !userId
+    ) {
+        return;
     }
 
-    function savePredictions() {
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(predictions)
-            );
-        } catch (error) {
-            console.error(
-                "Erreur lors de l'enregistrement :",
-                error
-            );
-
-            alert(
-                "Le pronostic n'a pas pu être enregistré."
-            );
-        }
+    if (arreterEcoutePronostics) {
+        arreterEcoutePronostics();
     }
 
+    const collectionPronostics =
+        firebaseFirestoreModule.collection(
+            firebaseDb,
+            "users",
+            userId,
+            "predictions"
+        );
+
+    arreterEcoutePronostics =
+        firebaseFirestoreModule.onSnapshot(
+            collectionPronostics,
+
+            function (snapshot) {
+                const nouveauxPronostics = {};
+
+                snapshot.docs.forEach(function (document) {
+                    const donnees = document.data();
+
+                    nouveauxPronostics[document.id] = {
+                        homeScore: Number(donnees.homeScore),
+                        awayScore: Number(donnees.awayScore),
+                        outcome: donnees.outcome,
+                        basePoints: Number(donnees.basePoints) || 0,
+                        savedAt: donnees.savedAt || null
+                    };
+                });
+
+                predictions = nouveauxPronostics;
+
+                console.log(
+                    `✅ ${snapshot.size} pronostic(s) chargé(s) depuis Firebase`
+                );
+
+                renderMatches();
+                renderMyPredictions();
+            },
+
+            function (erreur) {
+                console.error(
+                    "Impossible de charger les pronostics :",
+                    erreur
+                );
+            }
+        );
+}
+    
     function escapeHtml(value) {
         return String(value)
             .replaceAll("&", "&amp;")
@@ -790,76 +840,141 @@ async function chargerMatchsFirebase() {
         });
     }
 
-    function savePrediction(matchId) {
-        const match = getMatchById(matchId);
+    async function savePrediction(matchId) {
+    const match = getMatchById(matchId);
 
-        if (!match) {
-            alert("Match introuvable.");
-            return;
-        }
+    if (!match) {
+        alert("Match introuvable.");
+        return;
+    }
 
-        const homeInput = document.querySelector(
-            `[data-home-input="${matchId}"]`
+    if (isMatchLocked(match)) {
+        alert("Les pronostics sont fermés pour ce match.");
+        return;
+    }
+
+    if (
+        !firebaseAuth ||
+        !firebaseAuth.currentUser ||
+        !firebaseFirestoreModule ||
+        !firebaseDb
+    ) {
+        alert("Tu dois être connecté pour enregistrer ton pronostic.");
+        return;
+    }
+
+    const homeInput = document.querySelector(
+        `[data-home-input="${matchId}"]`
+    );
+
+    const awayInput = document.querySelector(
+        `[data-away-input="${matchId}"]`
+    );
+
+    if (!homeInput || !awayInput) {
+        alert("Les cases de score sont introuvables.");
+        return;
+    }
+
+    const homeValue = homeInput.value.trim();
+    const awayValue = awayInput.value.trim();
+
+    if (homeValue === "" || awayValue === "") {
+        alert("Entre le score des deux équipes.");
+        return;
+    }
+
+    const homeScore = Number(homeValue);
+    const awayScore = Number(awayValue);
+
+    if (
+        !isValidScore(homeScore) ||
+        !isValidScore(awayScore)
+    ) {
+        alert(
+            "Le score doit être un nombre entier entre 0 et 20."
         );
+        return;
+    }
 
-        const awayInput = document.querySelector(
-            `[data-away-input="${matchId}"]`
-        );
+    const outcome = getOutcome(
+        homeScore,
+        awayScore
+    );
 
-        if (!homeInput || !awayInput) {
-            alert("Les cases de score sont introuvables.");
-            return;
-        }
+    const pronostic = {
+        matchId,
+        homeScore,
+        awayScore,
+        outcome,
+        basePoints: getOutcomePoints(match, outcome),
+        savedAt: new Date().toISOString(),
+        updatedAt:
+            firebaseFirestoreModule.serverTimestamp()
+    };
 
-        const homeValue = homeInput.value.trim();
-        const awayValue = awayInput.value.trim();
+    const bouton = document.querySelector(
+        `[data-save-match="${matchId}"]`
+    );
 
-        if (homeValue === "" || awayValue === "") {
-            alert("Entre le score des deux équipes.");
-            return;
-        }
+    if (bouton) {
+        bouton.disabled = true;
+        bouton.textContent = "Enregistrement…";
+    }
 
-        const homeScore = Number(homeValue);
-        const awayScore = Number(awayValue);
+    try {
+        const userId = firebaseAuth.currentUser.uid;
 
-        if (
-            !isValidScore(homeScore) ||
-            !isValidScore(awayScore)
-        ) {
-            alert(
-                "Le score doit être un nombre entier entre 0 et 20."
+        const documentPronostic =
+            firebaseFirestoreModule.doc(
+                firebaseDb,
+                "users",
+                userId,
+                "predictions",
+                matchId
             );
 
-            return;
-        }
-
-        const outcome = getOutcome(
-            homeScore,
-            awayScore
+        await firebaseFirestoreModule.setDoc(
+            documentPronostic,
+            pronostic,
+            {
+                merge: true
+            }
         );
 
-        predictions[matchId] = {
-            homeScore,
-            awayScore,
-            outcome,
-            basePoints: getOutcomePoints(match, outcome),
-            savedAt: new Date().toISOString()
-        };
+        predictions[matchId] = pronostic;
 
-        savePredictions();
         renderMatches();
         renderMyPredictions();
 
-        const predictionsSection = document.getElementById(
-            "mes-pronos"
-        );
+        const predictionsSection =
+            document.getElementById("mes-pronos");
 
         predictionsSection?.scrollIntoView({
             behavior: "smooth",
             block: "start"
         });
-    }
 
+        console.log(
+            "✅ Pronostic enregistré dans Firebase :",
+            matchId
+        );
+    } catch (erreur) {
+        console.error(
+            "Impossible d’enregistrer le pronostic :",
+            erreur
+        );
+
+        alert(
+            "Le pronostic n’a pas pu être enregistré dans Firebase."
+        );
+
+        if (bouton) {
+            bouton.disabled = false;
+            bouton.textContent = "Valider";
+        }
+    }
+}
     function bindEditButtons() {
         const buttons = document.querySelectorAll(
             "[data-edit-match]"
@@ -876,7 +991,6 @@ async function chargerMatchsFirebase() {
 
                 delete predictions[matchId];
 
-                savePredictions();
                 renderMatches();
                 renderMyPredictions();
 
@@ -1040,6 +1154,10 @@ chargerMatchsFirebase();
 window.addEventListener("beforeunload", function () {
     if (arreterEcouteMatchs) {
         arreterEcouteMatchs();
+    }
+
+    if (arreterEcoutePronostics) {
+        arreterEcoutePronostics();
     }
 });
 
