@@ -90,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const matchCount = document.getElementById("match-count");
 
     let predictions = loadPredictions();
+    let connectedUser = null;
 
     function loadPredictions() {
         try {
@@ -126,6 +127,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 STORAGE_KEY,
                 JSON.stringify(predictions)
             );
+
+            if (connectedUser && window.mpmFirebase) {
+                window.mpmFirebase.savePredictions(predictions).catch((error) => {
+                    console.error("Erreur Firestore :", error);
+                });
+            }
         } catch (error) {
             console.error(
                 "Erreur lors de l'enregistrement :",
@@ -677,6 +684,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function savePrediction(matchId) {
+        if (!connectedUser) {
+            window.mpmFirebase?.openAuthModal();
+            return;
+        }
+
         const match = getMatchById(matchId);
 
         if (!match) {
@@ -753,6 +765,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         buttons.forEach((button) => {
             button.addEventListener("click", () => {
+                if (!connectedUser) {
+                    window.mpmFirebase?.openAuthModal();
+                    return;
+                }
+
                 const matchId = button.dataset.editMatch;
                 const prediction = predictions[matchId];
 
@@ -912,6 +929,19 @@ document.addEventListener("DOMContentLoaded", () => {
         function isMatchLocked(match){
     return new Date() >= new Date(match.kickoff);
 }
+
+    window.addEventListener("mpm-auth-change", (event) => {
+        connectedUser = event.detail.user;
+
+        if (connectedUser) {
+            predictions = event.detail.predictions || {};
+        } else {
+            predictions = {};
+        }
+
+        renderMatches();
+        renderMyPredictions();
+    });
 
     renderMatches();
     renderMyPredictions();
