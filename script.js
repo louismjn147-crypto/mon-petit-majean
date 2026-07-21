@@ -4,11 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const EXACT_SCORE_BONUS = 150;
     const STORAGE_KEY = "monPetitMajeanPredictionsV20";
 
-    const ADMIN_MATCHES_KEY = "adminMatches";
-
-    let matches = loadAdminMatches();
-
-    let matches = [];
+let matches = [];
 let arreterEcouteMatchs = null;
 
 async function chargerMatchsFirebase() {
@@ -88,24 +84,6 @@ async function chargerMatchsFirebase() {
         );
     }
 }
-
-    function loadAdminMatches() {
-        try {
-            const savedData = localStorage.getItem(ADMIN_MATCHES_KEY);
-            if (!savedData) return [];
-
-            const adminMatches = JSON.parse(savedData);
-            if (!Array.isArray(adminMatches)) return [];
-
-            return adminMatches.map((match, index) =>
-                convertAdminMatch(match, index)
-            );
-        } catch (error) {
-            console.error("Erreur lors du chargement des matchs admin :", error);
-            return [];
-        }
-    }
-
     function convertAdminMatch(match, index) {
         const homeTeam = String(match.homeTeam || "Équipe domicile").trim();
         const awayTeam = String(match.awayTeam || "Équipe extérieure").trim();
