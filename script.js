@@ -1042,3 +1042,5 @@ window.addEventListener("beforeunload", function () {
         arreterEcouteMatchs();
     }
 });
+
+});
