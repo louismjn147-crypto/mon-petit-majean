@@ -74,6 +74,7 @@ afficherClassementDeconnecte();
 
             renderMatches();
             renderMyPredictions();
+            renderArchives();
             
             matchsCharges = true;
             recalculerTotalJoueur();
@@ -116,6 +117,7 @@ afficherClassementDeconnecte();
 
                 renderMatches();
                 renderMyPredictions();
+                renderArchives();
                 
                 matchsCharges = true;
 recalculerTotalJoueur();
@@ -290,10 +292,18 @@ recalculerTotalJoueur();
     );
 
     const predictionsContainer = document.getElementById(
-        "my-predictions-container"
-    );
+    "my-predictions-container"
+);
 
-    const matchCount = document.getElementById("match-count");
+const archivesContainer = document.getElementById(
+    "archives-container"
+);
+
+const matchCount = document.getElementById("match-count");
+
+const archiveCount = document.getElementById(
+    "archive-count"
+);
 
     let predictions = {};
 
@@ -345,6 +355,7 @@ function ecouterPronosticsFirebase(userId) {
 
                 renderMatches();
                 renderMyPredictions();
+                renderArchives();
                 pronosticsCharges = true;
 recalculerTotalJoueur();
             },
@@ -895,61 +906,77 @@ function formaterBonsPronostics(nombre) {
     }
 
     function renderMatches() {
-        if (!matchesContainer) {
-            return;
-        }
-
-        if (matchCount) {
-            matchCount.textContent =
-                `${matches.length} matchs`;
-        }
-
-        matchesContainer.innerHTML = matches
-            .map((match) => {
-                const prediction = predictions[match.id];
-
-                return `
-                    <article class="match-card">
-
-                        <div class="match-topline">
-
-                            <div class="match-context">
-                                <span class="champions-star">
-                                    ★
-                                </span>
-
-                                <span>
-                                    ${escapeHtml(match.stage)}
-                                </span>
-                            </div>
-
-                            <time class="match-time">
-                                ${escapeHtml(match.date)}
-                                ·
-                                ${escapeHtml(match.time)}
-                            </time>
-
-                        </div>
-
-                        ${
-                            prediction
-                                ? renderSavedPrediction(
-                                    match,
-                                    prediction
-                                )
-                                : renderPredictionForm(match)
-                        }
-
-                    </article>
-                `;
-            })
-            .join("");
-
-        bindPredictionInputs();
-        bindSaveButtons();
-        bindEditButtons();
+    if (!matchesContainer) {
+        return;
     }
 
+    const matchsActifs = matches.filter(function (match) {
+        return !match.finalScore;
+    });
+
+    if (matchCount) {
+        const nombre = matchsActifs.length;
+
+        matchCount.textContent =
+            `${nombre} match${nombre > 1 ? "s" : ""}`;
+    }
+
+    if (matchsActifs.length === 0) {
+        matchesContainer.innerHTML = `
+            <div class="empty-card">
+                Aucun match à pronostiquer actuellement.
+            </div>
+        `;
+
+        return;
+    }
+
+    matchesContainer.innerHTML = matchsActifs
+        .map(function (match) {
+            const prediction = predictions[match.id];
+
+            return `
+                <article class="match-card">
+
+                    <div class="match-topline">
+
+                        <div class="match-context">
+                            <span class="champions-star">
+                                ★
+                            </span>
+
+                            <span>
+                                ${escapeHtml(match.stage)}
+                            </span>
+                        </div>
+
+                        <time class="match-time">
+                            ${escapeHtml(match.date)}
+                            ·
+                            ${escapeHtml(match.time)}
+                        </time>
+
+                    </div>
+
+                    ${
+                        prediction
+                            ? renderSavedPrediction(
+                                match,
+                                prediction
+                            )
+                            : renderPredictionForm(match)
+                    }
+
+                </article>
+            `;
+        })
+        .join("");
+
+    bindPredictionInputs();
+    bindSaveButtons();
+    bindEditButtons();
+}
+    
     function renderPredictionForm(match) {
         const locked = isMatchLocked(match);
         return `
@@ -1406,6 +1433,7 @@ function formaterBonsPronostics(nombre) {
 
         renderMatches();
         renderMyPredictions();
+        renderArchives();
 
         const predictionsSection =
             document.getElementById("mes-pronos");
@@ -1453,6 +1481,7 @@ function formaterBonsPronostics(nombre) {
 
                 renderMatches();
                 renderMyPredictions();
+                renderArchives();
 
                 requestAnimationFrame(() => {
                     const homeInput = document.querySelector(
@@ -1484,105 +1513,300 @@ function formaterBonsPronostics(nombre) {
     }
 
     function renderMyPredictions() {
-        if (!predictionsContainer) {
-            return;
-        }
+    if (!predictionsContainer) {
+        return;
+    }
 
-        const savedEntries = matches
-            .filter((match) => predictions[match.id])
-            .map((match) => ({
+    const pronosticsActifs = matches
+        .filter(function (match) {
+            return (
+                predictions[match.id] &&
+                !match.finalScore
+            );
+        })
+        .map(function (match) {
+            return {
                 match,
                 prediction: predictions[match.id]
-            }));
+            };
+        });
 
-        if (savedEntries.length === 0) {
-            predictionsContainer.innerHTML = `
-                <div class="empty-card">
-                    Aucun pronostic enregistré.
-                </div>
-            `;
+    if (pronosticsActifs.length === 0) {
+        predictionsContainer.innerHTML = `
+            <div class="empty-card">
+                Aucun pronostic en attente.
+            </div>
+        `;
 
-            return;
-        }
+        return;
+    }
 
-        predictionsContainer.innerHTML = savedEntries
-            .map(({ match, prediction }) => {
-                const result = calculatePredictionResult(
-                    match,
-                    prediction
-                );
+    predictionsContainer.innerHTML = pronosticsActifs
+        .map(function ({ match, prediction }) {
+            return `
+                <article class="prediction-summary">
 
-                const pointsText =
-                    result.points === null
-                        ? `${prediction.basePoints} pts possibles`
-                        : `${result.points} pts gagnés`;
+                    <div class="prediction-summary-date">
+                        <span>
+                            ${escapeHtml(match.date)}
+                        </span>
 
-                return `
-                    <article class="prediction-summary">
+                        <small>
+                            ${escapeHtml(match.time)}
+                        </small>
+                    </div>
 
-                        <div class="prediction-summary-date">
-                            <span>
-                                ${escapeHtml(match.date)}
+                    <div class="prediction-summary-match">
+
+                        <div class="summary-team">
+                            <span class="summary-team-code">
+                                ${escapeHtml(match.homeShort)}
                             </span>
-
-                            <small>
-                                ${escapeHtml(match.time)}
-                            </small>
-                        </div>
-
-                        <div class="prediction-summary-match">
-
-                            <div class="summary-team">
-                                <span class="summary-team-code">
-                                    ${escapeHtml(match.homeShort)}
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(match.homeTeam)}
-                                </strong>
-                            </div>
-
-                            <div class="summary-score">
-                                ${prediction.homeScore}
-                                -
-                                ${prediction.awayScore}
-                            </div>
-
-                            <div class="summary-team summary-team-away">
-                                <span class="summary-team-code">
-                                    ${escapeHtml(match.awayShort)}
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(match.awayTeam)}
-                                </strong>
-                            </div>
-
-                        </div>
-
-                        <div class="prediction-summary-points">
 
                             <strong>
-                                ${pointsText}
+                                ${escapeHtml(match.homeTeam)}
                             </strong>
-
-                            <span>
-                                Exact :
-                                ${
-                                    prediction.basePoints +
-                                    EXACT_SCORE_BONUS
-                                }
-                                pts
-                            </span>
-
                         </div>
 
-                    </article>
+                        <div class="summary-score">
+                            ${prediction.homeScore}
+                            -
+                            ${prediction.awayScore}
+                        </div>
+
+                        <div class="summary-team summary-team-away">
+                            <span class="summary-team-code">
+                                ${escapeHtml(match.awayShort)}
+                            </span>
+
+                            <strong>
+                                ${escapeHtml(match.awayTeam)}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="prediction-summary-points">
+
+                        <strong>
+                            ${prediction.basePoints} pts possibles
+                        </strong>
+
+                        <span>
+                            Score exact :
+                            ${
+                                prediction.basePoints +
+                                EXACT_SCORE_BONUS
+                            }
+                            pts
+                        </span>
+
+                    </div>
+
+                </article>
+            `;
+        })
+        .join("");
+}
+
+    function renderArchives() {
+    if (!archivesContainer) {
+        return;
+    }
+
+    const matchsArchives = matches
+        .filter(function (match) {
+            return (
+                predictions[match.id] &&
+                match.finalScore
+            );
+        })
+        .map(function (match) {
+            return {
+                match,
+                prediction: predictions[match.id]
+            };
+        })
+        .sort(function (elementA, elementB) {
+            const dateA =
+                elementA.match.kickoff || "";
+
+            const dateB =
+                elementB.match.kickoff || "";
+
+            return dateB.localeCompare(dateA);
+        });
+
+    if (archiveCount) {
+        const nombre = matchsArchives.length;
+
+        archiveCount.textContent =
+            `${nombre} match${nombre > 1 ? "s" : ""}`;
+    }
+
+    if (matchsArchives.length === 0) {
+        archivesContainer.innerHTML = `
+            <div class="empty-card">
+                Aucun match archivé.
+            </div>
+        `;
+
+        return;
+    }
+
+    const groupes = {};
+
+    matchsArchives.forEach(function (element) {
+        const phase =
+            element.match.stage ||
+            "Autres matchs";
+
+        if (!groupes[phase]) {
+            groupes[phase] = [];
+        }
+
+        groupes[phase].push(element);
+    });
+
+    archivesContainer.innerHTML =
+        Object.entries(groupes)
+            .map(function ([phase, elements]) {
+                return `
+                    <div class="archive-group">
+
+                        <div class="section-header">
+                            <div>
+                                <p class="section-kicker">
+                                    Compétition
+                                </p>
+
+                                <h3>
+                                    ${escapeHtml(phase)}
+                                </h3>
+                            </div>
+
+                            <span class="section-counter">
+                                ${elements.length}
+                                match${
+                                    elements.length > 1
+                                        ? "s"
+                                        : ""
+                                }
+                            </span>
+                        </div>
+
+                        <div class="predictions-container">
+                            ${elements
+                                .map(function ({
+                                    match,
+                                    prediction
+                                }) {
+                                    return renderArchiveMatch(
+                                        match,
+                                        prediction
+                                    );
+                                })
+                                .join("")}
+                        </div>
+
+                    </div>
                 `;
             })
             .join("");
-    }
+}
+    function renderArchiveMatch(match, prediction) {
+    const result = calculatePredictionResult(
+        match,
+        prediction
+    );
 
+    const scoreReel =
+        match.finalScore
+            ? `${match.finalScore.home} - ${match.finalScore.away}`
+            : "-";
+
+    const classesResultat = {
+        exact: "result-exact",
+        correct: "result-correct",
+        wrong: "result-wrong"
+    };
+
+    const classeResultat =
+        classesResultat[result.status] ||
+        "result-pending";
+
+    const textePoints =
+        result.points === 1
+            ? "1 point gagné"
+            : `${result.points || 0} points gagnés`;
+
+    return `
+        <article class="prediction-summary">
+
+            <div class="prediction-summary-date">
+                <span>
+                    ${escapeHtml(match.date)}
+                </span>
+
+                <small>
+                    ${escapeHtml(match.time)}
+                </small>
+            </div>
+
+            <div class="prediction-summary-match">
+
+                <div class="summary-team">
+                    <span class="summary-team-code">
+                        ${escapeHtml(match.homeShort)}
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(match.homeTeam)}
+                    </strong>
+                </div>
+
+                <div class="summary-score">
+                    ${scoreReel}
+                </div>
+
+                <div class="summary-team summary-team-away">
+                    <span class="summary-team-code">
+                        ${escapeHtml(match.awayShort)}
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(match.awayTeam)}
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="prediction-summary-points">
+
+                <span>
+                    Mon pronostic :
+                    <strong>
+                        ${prediction.homeScore}
+                        -
+                        ${prediction.awayScore}
+                    </strong>
+                </span>
+
+                <div class="result-status ${classeResultat}">
+                    <span>
+                        ${escapeHtml(result.label)}
+                    </span>
+
+                    <strong>
+                        ${textePoints}
+                    </strong>
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
     function bindNavigationTabs() {
         const tabs = document.querySelectorAll(".main-tab");
 
@@ -1608,6 +1832,7 @@ function formaterBonsPronostics(nombre) {
 
     renderMatches();
 renderMyPredictions();
+    renderArchives();
 bindNavigationTabs();
 chargerMatchsFirebase();
 
