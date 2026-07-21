@@ -226,14 +226,14 @@ recalculerTotalJoueur();
             parissg: "logos/psg.png",
             psg: "logos/psg.png",
             realmadrid: "logos/madrid.png",
-            manchestercity: "logos/manchester.jpg",
-            mancity: "logos/manchester.jpg",
+            manchestercity: "logos/manchester.png",
+            mancity: "logos/manchester.png",
             intermilano: "logos/inter.png",
             inter: "logos/inter.png",
-            rclens: "logos/rclens.jpg",
-            lens: "logos/rclens.jpg",
-            bayernmunich: "logos/munich.jpg",
-            bayern: "logos/munich.jpg",
+            rclens: "logos/rclens.png",
+            lens: "logos/rclens.png",
+            bayernmunich: "logos/munich.png",
+            bayern: "logos/munich.png",
             arsenal: "logos/arsenal.png"
         };
 
