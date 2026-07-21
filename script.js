@@ -14,6 +14,9 @@ let firebaseAuth = null;
 let firebaseDb = null;
 
 let arreterEcoutePronostics = null;
+    let matchsCharges = false;
+let pronosticsCharges = false;
+let dernierTotalEnregistre = null;
 
 async function chargerMatchsFirebase() {
     try {
@@ -52,6 +55,9 @@ const db = firebaseDb;
     function (utilisateur) {
         if (!utilisateur) {
             predictions = {};
+            matchsCharges = false;
+pronosticsCharges = false;
+dernierTotalEnregistre = null;
 
             if (arreterEcoutePronostics) {
                 arreterEcoutePronostics();
@@ -60,6 +66,10 @@ const db = firebaseDb;
 
             renderMatches();
             renderMyPredictions();
+            
+            matchsCharges = true;
+            recalculerTotalJoueur();
+            
             return;
         }
 
@@ -97,6 +107,9 @@ const db = firebaseDb;
 
                 renderMatches();
                 renderMyPredictions();
+                
+                pronosticsCharges = true;
+                recalculerTotalJoueur();
             },
 
             function (erreur) {
@@ -333,7 +346,108 @@ function ecouterPronosticsFirebase(userId) {
             }
         );
 }
-    
+    async function recalculerTotalJoueur() {
+
+    if (
+        !matchsCharges ||
+        !pronosticsCharges ||
+        !firebaseAuth ||
+        !firebaseAuth.currentUser ||
+        !firebaseFirestoreModule ||
+        !firebaseDb
+    ) {
+        return;
+    }
+
+    let totalPoints = 0;
+    let matchsJoues = 0;
+    let scoresExacts = 0;
+    let bonsResultats = 0;
+
+    matches.forEach(function (match) {
+
+        const prediction = predictions[match.id];
+
+        if (!prediction || !match.finalScore) {
+            return;
+        }
+
+        const resultat = calculatePredictionResult(
+            match,
+            prediction
+        );
+
+        if (resultat.points === null) {
+            return;
+        }
+
+        totalPoints += Number(resultat.points) || 0;
+        matchsJoues += 1;
+
+        if (resultat.status === "exact") {
+            scoresExacts += 1;
+        }
+
+        if (
+            resultat.status === "exact" ||
+            resultat.status === "correct"
+        ) {
+            bonsResultats += 1;
+        }
+    });
+
+    if (dernierTotalEnregistre === totalPoints) {
+        return;
+    }
+
+    const utilisateur = firebaseAuth.currentUser;
+
+    const nomJoueur =
+        utilisateur.displayName ||
+        utilisateur.email?.split("@")[0] ||
+        "Joueur";
+
+    try {
+
+        await firebaseFirestoreModule.setDoc(
+
+            firebaseFirestoreModule.doc(
+                firebaseDb,
+                "users",
+                utilisateur.uid
+            ),
+
+            {
+                displayName: nomJoueur,
+                totalPoints,
+                matchsJoues,
+                scoresExacts,
+                bonsResultats,
+                updatedAt:
+                    firebaseFirestoreModule.serverTimestamp()
+            },
+
+            {
+                merge: true
+            }
+
+        );
+
+        dernierTotalEnregistre = totalPoints;
+
+        console.log(
+            `✅ Total enregistré : ${totalPoints} points`
+        );
+
+    } catch (erreur) {
+
+        console.error(
+            "Impossible d'enregistrer le total du joueur :",
+            erreur
+        );
+
+    }
+}
     function escapeHtml(value) {
         return String(value)
             .replaceAll("&", "&amp;")
