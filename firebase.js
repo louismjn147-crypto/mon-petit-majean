@@ -1,32 +1,8 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
-    authDomain: "mon-petit-majean-82a7d.firebaseapp.com",
-    projectId: "mon-petit-majean-82a7d",
-    storageBucket: "mon-petit-majean-82a7d.firebasestorage.app",
-    messagingSenderId: "687822253256",
-    appId: "1:687822253256:web:18f9a763fa3522f90e09fd"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+/*
+ * Firebase + interface de connexion.
+ * Les boutons et la fenêtre sont branchés AVANT le chargement de Firebase,
+ * donc la fenêtre s'ouvre même si le réseau ou Firebase rencontre une erreur.
+ */
 
 const modal = document.getElementById("auth-modal");
 const loginForm = document.getElementById("login-form");
@@ -39,6 +15,7 @@ const loginTab = document.getElementById("show-login");
 const registerTab = document.getElementById("show-register");
 
 let currentUser = null;
+let firebaseServices = null;
 
 function showMessage(message, isError = true) {
     if (!authMessage) return;
@@ -48,18 +25,22 @@ function showMessage(message, isError = true) {
 }
 
 function clearMessage() {
-    if (authMessage) authMessage.textContent = "";
+    if (!authMessage) return;
+    authMessage.textContent = "";
+    authMessage.classList.remove("auth-message-error", "auth-message-success");
 }
 
 function openAuthModal() {
-    modal?.classList.add("auth-modal-open");
-    modal?.setAttribute("aria-hidden", "false");
+    if (!modal) return;
+    modal.classList.add("auth-modal-open");
+    modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-is-open");
 }
 
 function closeAuthModal() {
-    modal?.classList.remove("auth-modal-open");
-    modal?.setAttribute("aria-hidden", "true");
+    if (!modal) return;
+    modal.classList.remove("auth-modal-open");
+    modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-is-open");
     clearMessage();
 }
@@ -106,142 +87,176 @@ function updatePlayerInterface(user, profile = {}) {
     logoutButton?.classList.toggle("auth-hidden", !user);
 }
 
-async function loadUserData(user) {
-    const userRef = doc(db, "users", user.uid);
-    const snapshot = await getDoc(userRef);
-
-    if (!snapshot.exists()) {
-        const profile = {
-            pseudo: user.displayName || "Joueur",
-            email: user.email,
-            points: 0,
-            createdAt: serverTimestamp()
-        };
-        await setDoc(userRef, profile, { merge: true });
-        return { profile, predictions: {} };
+// Branchement immédiat de l'interface : aucun import Firebase nécessaire.
+authOpenButton?.addEventListener("click", openAuthModal);
+closeButton?.addEventListener("click", closeAuthModal);
+loginTab?.addEventListener("click", () => showForm("login"));
+registerTab?.addEventListener("click", () => showForm("register"));
+modal?.addEventListener("click", (event) => {
+    if (event.target === modal) closeAuthModal();
+});
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal?.classList.contains("auth-modal-open")) {
+        closeAuthModal();
     }
-
-    const data = snapshot.data();
-    return {
-        profile: data,
-        predictions: data.predictions || {}
-    };
-}
-
-async function savePredictions(predictions) {
-    if (!auth.currentUser) {
-        throw new Error("Aucun joueur connecté.");
-    }
-
-    await setDoc(
-        doc(db, "users", auth.currentUser.uid),
-        {
-            predictions,
-            updatedAt: serverTimestamp()
-        },
-        { merge: true }
-    );
-}
+});
 
 window.mpmFirebase = {
     currentUser: () => currentUser,
     openAuthModal,
-    savePredictions
+    savePredictions: async () => {
+        throw new Error("Firebase est encore en cours de chargement.");
+    }
 };
 
-authOpenButton?.addEventListener("click", openAuthModal);
-closeButton?.addEventListener("click", closeAuthModal);
-modal?.addEventListener("click", (event) => {
-    if (event.target === modal) closeAuthModal();
-});
-loginTab?.addEventListener("click", () => showForm("login"));
-registerTab?.addEventListener("click", () => showForm("register"));
-logoutButton?.addEventListener("click", async () => {
-    await signOut(auth);
-});
-
-loginForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearMessage();
-
-    const email = loginForm.elements.email.value.trim();
-    const password = loginForm.elements.password.value;
-
+async function startFirebase() {
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-        closeAuthModal();
-        loginForm.reset();
-    } catch (error) {
-        console.error(error);
-        showMessage("Connexion impossible. Vérifie ton e-mail et ton mot de passe.");
-    }
-});
+        const [appModule, authModule, firestoreModule] = await Promise.all([
+            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+        ]);
 
-registerForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearMessage();
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
+            authDomain: "mon-petit-majean-82a7d.firebaseapp.com",
+            projectId: "mon-petit-majean-82a7d",
+            storageBucket: "mon-petit-majean-82a7d.firebasestorage.app",
+            messagingSenderId: "687822253256",
+            appId: "1:687822253256:web:18f9a763fa3522f90e09fd"
+        };
 
-    const pseudo = registerForm.elements.pseudo.value.trim();
-    const email = registerForm.elements.email.value.trim();
-    const password = registerForm.elements.password.value;
-    const confirmation = registerForm.elements.confirmation.value;
+        const app = appModule.initializeApp(firebaseConfig);
+        const auth = authModule.getAuth(app);
+        const db = firestoreModule.getFirestore(app);
 
-    if (pseudo.length < 2) {
-        showMessage("Le pseudo doit contenir au moins 2 caractères.");
-        return;
-    }
+        firebaseServices = { auth, db, authModule, firestoreModule };
 
-    if (password.length < 6) {
-        showMessage("Le mot de passe doit contenir au moins 6 caractères.");
-        return;
-    }
+        async function loadUserData(user) {
+            const userRef = firestoreModule.doc(db, "users", user.uid);
+            const snapshot = await firestoreModule.getDoc(userRef);
 
-    if (password !== confirmation) {
-        showMessage("Les deux mots de passe ne correspondent pas.");
-        return;
-    }
+            if (!snapshot.exists()) {
+                const profile = {
+                    pseudo: user.displayName || "Joueur",
+                    email: user.email,
+                    points: 0,
+                    predictions: {},
+                    createdAt: firestoreModule.serverTimestamp()
+                };
+                await firestoreModule.setDoc(userRef, profile, { merge: true });
+                return { profile, predictions: {} };
+            }
 
-    try {
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(credential.user, { displayName: pseudo });
-        await setDoc(doc(db, "users", credential.user.uid), {
-            pseudo,
-            email,
-            points: 0,
-            predictions: {},
-            createdAt: serverTimestamp()
+            const data = snapshot.data();
+            return { profile: data, predictions: data.predictions || {} };
+        }
+
+        async function savePredictions(predictions) {
+            if (!auth.currentUser) {
+                openAuthModal();
+                throw new Error("Connecte-toi pour enregistrer ton pronostic.");
+            }
+
+            await firestoreModule.setDoc(
+                firestoreModule.doc(db, "users", auth.currentUser.uid),
+                { predictions, updatedAt: firestoreModule.serverTimestamp() },
+                { merge: true }
+            );
+        }
+
+        window.mpmFirebase = {
+            currentUser: () => currentUser,
+            openAuthModal,
+            savePredictions
+        };
+
+        logoutButton?.addEventListener("click", async () => {
+            await authModule.signOut(auth);
         });
-        closeAuthModal();
-        registerForm.reset();
+
+        loginForm?.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            clearMessage();
+
+            const email = loginForm.elements.email.value.trim();
+            const password = loginForm.elements.password.value;
+
+            try {
+                await authModule.signInWithEmailAndPassword(auth, email, password);
+                closeAuthModal();
+                loginForm.reset();
+            } catch (error) {
+                console.error(error);
+                showMessage("Connexion impossible. Vérifie ton e-mail et ton mot de passe.");
+            }
+        });
+
+        registerForm?.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            clearMessage();
+
+            const pseudo = registerForm.elements.pseudo.value.trim();
+            const email = registerForm.elements.email.value.trim();
+            const password = registerForm.elements.password.value;
+            const confirmation = registerForm.elements.confirmation.value;
+
+            if (pseudo.length < 2) return showMessage("Le pseudo doit contenir au moins 2 caractères.");
+            if (password.length < 6) return showMessage("Le mot de passe doit contenir au moins 6 caractères.");
+            if (password !== confirmation) return showMessage("Les deux mots de passe ne correspondent pas.");
+
+            try {
+                const credential = await authModule.createUserWithEmailAndPassword(auth, email, password);
+                await authModule.updateProfile(credential.user, { displayName: pseudo });
+                await firestoreModule.setDoc(
+                    firestoreModule.doc(db, "users", credential.user.uid),
+                    {
+                        pseudo,
+                        email,
+                        points: 0,
+                        predictions: {},
+                        createdAt: firestoreModule.serverTimestamp()
+                    },
+                    { merge: true }
+                );
+                closeAuthModal();
+                registerForm.reset();
+            } catch (error) {
+                console.error(error);
+                showMessage(
+                    error.code === "auth/email-already-in-use"
+                        ? "Cette adresse e-mail possède déjà un compte."
+                        : "Inscription impossible. Vérifie les informations saisies."
+                );
+            }
+        });
+
+        authModule.onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+
+            if (!user) {
+                updatePlayerInterface(null);
+                window.dispatchEvent(new CustomEvent("mpm-auth-change", {
+                    detail: { user: null, profile: null, predictions: {} }
+                }));
+                return;
+            }
+
+            try {
+                const { profile, predictions } = await loadUserData(user);
+                updatePlayerInterface(user, profile);
+                window.dispatchEvent(new CustomEvent("mpm-auth-change", {
+                    detail: { user, profile, predictions }
+                }));
+            } catch (error) {
+                console.error("Erreur de chargement du compte :", error);
+                updatePlayerInterface(user, {});
+            }
+        });
     } catch (error) {
-        console.error(error);
-        showMessage(
-            error.code === "auth/email-already-in-use"
-                ? "Cette adresse e-mail possède déjà un compte."
-                : "Inscription impossible. Vérifie les informations saisies."
-        );
+        console.error("Firebase n'a pas pu être chargé :", error);
+        showMessage("La fenêtre fonctionne, mais Firebase n'a pas pu se charger. Recharge la page avec Ctrl + F5.");
     }
-});
+}
 
-onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-
-    if (!user) {
-        updatePlayerInterface(null);
-        window.dispatchEvent(new CustomEvent("mpm-auth-change", {
-            detail: { user: null, profile: null, predictions: {} }
-        }));
-        return;
-    }
-
-    try {
-        const { profile, predictions } = await loadUserData(user);
-        updatePlayerInterface(user, profile);
-        window.dispatchEvent(new CustomEvent("mpm-auth-change", {
-            detail: { user, profile, predictions }
-        }));
-    } catch (error) {
-        console.error("Erreur de chargement du compte :", error);
-        showMessage("Le compte est connecté, mais ses données n'ont pas pu être chargées.");
-    }
-});
+startFirebase();
