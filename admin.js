@@ -1,232 +1,233 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    "use strict";
 
-    const PASSWORD = "Majean2025";
+    const ADMIN_UID = "JpxPZLROVTciu2tgUzXH7ZQ79303";
 
-    const loginButton = document.getElementById("login-admin");
+    const firebaseConfig = {
+        apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
+        authDomain: "mon-petit-majean-82a7d.firebaseapp.com",
+        projectId: "mon-petit-majean-82a7d",
+        storageBucket: "mon-petit-majean-82a7d.firebasestorage.app",
+        messagingSenderId: "687822253256",
+        appId: "1:687822253256:web:18f9a763fa3522f90e09fd"
+    };
+
+    const [
+        appModule,
+        authModule,
+        firestoreModule
+    ] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+    ]);
+
+    const app = appModule.initializeApp(firebaseConfig);
+    const auth = authModule.getAuth(app);
+    const db = firestoreModule.getFirestore(app);
+
+    const emailInput = document.getElementById("admin-email");
     const passwordInput = document.getElementById("admin-password");
+    const loginButton = document.getElementById("login-admin");
     const loginBox = document.querySelector(".admin-login");
     const adminPanel = document.getElementById("admin-panel");
+    const addButton = document.getElementById("add-match");
+    const matchesList = document.getElementById("matches-list");
 
-    let matchEnModification = null;
+    let editingMatchId = null;
+    let stopListening = null;
 
-    let firebaseCloud = null;
-
-chargerFirebase();
-
-async function chargerFirebase() {
-    try {
-        const [appModule, authModule, firestoreModule] =
-            await Promise.all([
-                import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-                import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
-                import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
-            ]);
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
-            authDomain: "mon-petit-majean-82a7d.firebaseapp.com",
-            projectId: "mon-petit-majean-82a7d",
-            storageBucket: "mon-petit-majean-82a7d.firebasestorage.app",
-            messagingSenderId: "687822253256",
-            appId: "1:687822253256:web:18f9a763fa3522f90e09fd"
-        };
-
-        const app = appModule.initializeApp(firebaseConfig);
-        const auth = authModule.getAuth(app);
-        const db = firestoreModule.getFirestore(app);
-
-        firebaseCloud = {
-            auth,
-            db,
-            firestoreModule
-        };
-
-        console.log("✅ Firebase chargé dans l’admin");
-    } catch (erreur) {
-        console.error("Firebase indisponible :", erreur);
-    }
-}
-
-async function synchroniserMatchsFirebase(matchs) {
-    if (!firebaseCloud) {
-        console.warn("Firebase n’est pas encore chargé.");
-        return;
-    }
-
-    const { auth, db, firestoreModule } = firebaseCloud;
-
-    try {
-        await auth.authStateReady();
-
-        if (!auth.currentUser) {
-            console.warn(
-                "Connecte-toi d’abord sur le site principal avec ton compte Firebase."
-            );
-            return;
-        }
-
-        await firestoreModule.setDoc(
-            firestoreModule.doc(db, "appData", "matches"),
-            {
-                matches: matchs,
-                updatedAt: firestoreModule.serverTimestamp(),
-                updatedBy: auth.currentUser.uid
-            },
-            { merge: true }
-        );
-
-        console.log("✅ Matchs envoyés dans Firebase");
-    } catch (erreur) {
-        console.error(
-            "Erreur pendant l’envoi des matchs dans Firebase :",
-            erreur
-        );
-    }
-}
-
-    if (!loginButton || !passwordInput || !loginBox || !adminPanel) {
-        console.error("Éléments de connexion admin introuvables.");
-        return;
-    }
-
-    loginButton.addEventListener("click", login);
+    loginButton.addEventListener("click", connecterAdmin);
 
     passwordInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
-            login();
+            connecterAdmin();
         }
     });
 
-    function login() {
+    addButton.addEventListener("click", enregistrerMatch);
 
-        if (passwordInput.value !== PASSWORD) {
-            alert("Mot de passe incorrect.");
+    authModule.onAuthStateChanged(auth, function (user) {
+        if (user && user.uid === ADMIN_UID) {
+            ouvrirAdmin();
+        } else {
+            fermerAdmin();
+        }
+    });
+
+    async function connecterAdmin() {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+            alert("Entre l’e-mail et le mot de passe administrateur.");
             return;
         }
 
+        loginButton.disabled = true;
+        loginButton.textContent = "Connexion…";
+
+        try {
+            const resultat =
+                await authModule.signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+            if (resultat.user.uid !== ADMIN_UID) {
+                await authModule.signOut(auth);
+                alert("Ce compte n’est pas autorisé à administrer le site.");
+                return;
+            }
+
+            passwordInput.value = "";
+        } catch (erreur) {
+            console.error(erreur);
+            alert("E-mail ou mot de passe incorrect.");
+        } finally {
+            loginButton.disabled = false;
+            loginButton.textContent = "Connexion";
+        }
+    }
+
+    function ouvrirAdmin() {
         loginBox.style.display = "none";
         adminPanel.style.display = "block";
-
-        initialiseAdmin();
-        afficherMatchs();
+        ecouterMatchs();
     }
 
-    function initialiseAdmin() {
+    function fermerAdmin() {
+        loginBox.style.display = "block";
+        adminPanel.style.display = "none";
 
-        const boutonAjouter = document.getElementById("add-match");
+        if (stopListening) {
+            stopListening();
+            stopListening = null;
+        }
+    }
 
-        if (!boutonAjouter) {
-            console.error('Le bouton id="add-match" est introuvable.');
+    function ecouterMatchs() {
+        if (stopListening) {
+            stopListening();
+        }
+
+        const requete = firestoreModule.query(
+            firestoreModule.collection(db, "matches"),
+            firestoreModule.orderBy("kickoff", "asc")
+        );
+
+        stopListening = firestoreModule.onSnapshot(
+            requete,
+            function (snapshot) {
+                const matchs = snapshot.docs.map(function (document) {
+                    return {
+                        id: document.id,
+                        ...document.data()
+                    };
+                });
+
+                afficherMatchs(matchs);
+            },
+            function (erreur) {
+                console.error(erreur);
+                matchesList.innerHTML =
+                    "<p>Impossible de charger les matchs.</p>";
+            }
+        );
+    }
+
+    async function enregistrerMatch() {
+        if (!auth.currentUser || auth.currentUser.uid !== ADMIN_UID) {
+            alert("Tu dois être connecté avec le compte administrateur.");
             return;
         }
 
-        boutonAjouter.onclick = function () {
+        const homeTeam = lireChamp("home-team");
+        const awayTeam = lireChamp("away-team");
+        const date = lireChamp("match-date");
+        const time = lireChamp("match-time");
 
-            const domicile = lireChamp("home-team");
-            const exterieur = lireChamp("away-team");
-            const date = lireChamp("match-date");
-            const heure = lireChamp("match-time");
+        const homeOdds = lireNombre("home-odds");
+        const drawOdds = lireNombre("draw-odds");
+        const awayOdds = lireNombre("away-odds");
 
-            const coteDomicile = lireNombre("home-odds");
-            const coteNul = lireNombre("draw-odds");
-            const coteExterieur = lireNombre("away-odds");
+        if (!homeTeam || !awayTeam || !date || !time) {
+            alert("Remplis les équipes, la date et l’heure.");
+            return;
+        }
 
-            if (
-                domicile === "" ||
-                exterieur === "" ||
-                date === "" ||
-                heure === ""
-            ) {
-                alert("Remplis les équipes, la date et l’heure.");
-                return;
-            }
+        if (
+            homeOdds === null ||
+            drawOdds === null ||
+            awayOdds === null ||
+            homeOdds <= 0 ||
+            drawOdds <= 0 ||
+            awayOdds <= 0
+        ) {
+            alert("Remplis correctement les trois cotes.");
+            return;
+        }
 
-            if (
-                coteDomicile === null ||
-                coteNul === null ||
-                coteExterieur === null
-            ) {
-                alert(
-                    "Les trois champs de cotes sont absents dans admin.html."
+        const donneesMatch = {
+            homeTeam,
+            awayTeam,
+            date,
+            time,
+            kickoff: `${date}T${time}:00`,
+            homeOdds,
+            drawOdds,
+            awayOdds,
+            updatedAt: firestoreModule.serverTimestamp()
+        };
+
+        addButton.disabled = true;
+        addButton.textContent = "Enregistrement…";
+
+        try {
+            if (editingMatchId) {
+                await firestoreModule.updateDoc(
+                    firestoreModule.doc(
+                        db,
+                        "matches",
+                        editingMatchId
+                    ),
+                    donneesMatch
                 );
-                return;
-            }
-
-            if (
-                coteDomicile <= 0 ||
-                coteNul <= 0 ||
-                coteExterieur <= 0
-            ) {
-                alert("Remplis correctement les trois cotes.");
-                return;
-            }
-
-            const nouveauMatch = {
-                homeTeam: domicile,
-                awayTeam: exterieur,
-                date: date,
-                time: heure,
-                homeOdds: coteDomicile,
-                drawOdds: coteNul,
-                awayOdds: coteExterieur
-            };
-
-            const matchs = obtenirMatchs();
-
-            if (matchEnModification === null) {
-
-                matchs.push(nouveauMatch);
-
-                alert("✅ Match enregistré !");
-
-            } else {
-
-                matchs[matchEnModification] = nouveauMatch;
-
-                matchEnModification = null;
-
-                boutonAjouter.textContent = "Ajouter le match";
 
                 alert("✅ Match modifié !");
+            } else {
+                await firestoreModule.addDoc(
+                    firestoreModule.collection(db, "matches"),
+                    {
+                        ...donneesMatch,
+                        createdAt: firestoreModule.serverTimestamp()
+                    }
+                );
+
+                alert("✅ Match ajouté !");
             }
 
-            enregistrerMatchs(matchs);
+            editingMatchId = null;
             viderFormulaire();
-            afficherMatchs();
-        };
+        } catch (erreur) {
+            console.error(erreur);
+            alert("Impossible d’enregistrer le match dans Firebase.");
+        } finally {
+            addButton.disabled = false;
+            addButton.textContent = "Ajouter le match";
+        }
     }
 
-    function afficherMatchs() {
-
-        const liste = document.getElementById("matches-list");
-
-        if (!liste) {
-            console.error(
-                'Le bloc id="matches-list" est introuvable.'
-            );
-            return;
-        }
-
-        const matchs = obtenirMatchs();
-
+    function afficherMatchs(matchs) {
         if (matchs.length === 0) {
-            liste.innerHTML = "<p>Aucun match enregistré.</p>";
+            matchesList.innerHTML = "<p>Aucun match enregistré.</p>";
             return;
         }
 
-        liste.innerHTML = "";
+        matchesList.innerHTML = "";
 
-        matchs.forEach(function (match, index) {
-
-            const coteDomicile =
-                match.homeOdds ?? "Non renseignée";
-
-            const coteNul =
-                match.drawOdds ?? "Non renseignée";
-
-            const coteExterieur =
-                match.awayOdds ?? "Non renseignée";
-
+        matchs.forEach(function (match) {
             const carte = document.createElement("div");
 
             carte.style.background = "#243244";
@@ -235,104 +236,67 @@ async function synchroniserMatchsFirebase(matchs) {
             carte.style.marginBottom = "10px";
 
             carte.innerHTML = `
-                <strong>${match.homeTeam}</strong>
+                <strong>${echapper(match.homeTeam)}</strong>
                 -
-                <strong>${match.awayTeam}</strong>
+                <strong>${echapper(match.awayTeam)}</strong>
 
                 <br><br>
 
-                ${match.date} à ${match.time}
+                ${echapper(match.date)} à ${echapper(match.time)}
 
                 <br><br>
 
-                Victoire ${match.homeTeam} :
-                ${coteDomicile} pts
+                Victoire ${echapper(match.homeTeam)} :
+                ${match.homeOdds} pts
 
                 <br>
 
                 Match nul :
-                ${coteNul} pts
+                ${match.drawOdds} pts
 
                 <br>
 
-                Victoire ${match.awayTeam} :
-                ${coteExterieur} pts
+                Victoire ${echapper(match.awayTeam)} :
+                ${match.awayOdds} pts
 
                 <br><br>
 
-                <button
-                    type="button"
-                    class="edit-match-button"
-                    data-index="${index}"
-                >
+                <button type="button" class="edit-match-button">
                     ✏️ Modifier
                 </button>
 
-                <button
-                    type="button"
-                    class="delete-match-button"
-                    data-index="${index}"
-                >
+                <button type="button" class="delete-match-button">
                     🗑️ Supprimer
                 </button>
             `;
 
-            liste.appendChild(carte);
+            carte
+                .querySelector(".edit-match-button")
+                .addEventListener("click", function () {
+                    modifierMatch(match);
+                });
+
+            carte
+                .querySelector(".delete-match-button")
+                .addEventListener("click", function () {
+                    supprimerMatch(match.id);
+                });
+
+            matchesList.appendChild(carte);
         });
-
-        document
-            .querySelectorAll(".edit-match-button")
-            .forEach(function (bouton) {
-
-                bouton.addEventListener("click", function () {
-
-                    const index = Number(bouton.dataset.index);
-
-                    modifierMatch(index);
-                });
-            });
-
-        document
-            .querySelectorAll(".delete-match-button")
-            .forEach(function (bouton) {
-
-                bouton.addEventListener("click", function () {
-
-                    const index = Number(bouton.dataset.index);
-
-                    supprimerMatch(index);
-                });
-            });
     }
 
-    function modifierMatch(index) {
-
-        const matchs = obtenirMatchs();
-        const match = matchs[index];
-
-        if (!match) {
-            alert("Ce match est introuvable.");
-            return;
-        }
-
+    function modifierMatch(match) {
         remplirChamp("home-team", match.homeTeam);
         remplirChamp("away-team", match.awayTeam);
         remplirChamp("match-date", match.date);
         remplirChamp("match-time", match.time);
+        remplirChamp("home-odds", match.homeOdds);
+        remplirChamp("draw-odds", match.drawOdds);
+        remplirChamp("away-odds", match.awayOdds);
 
-        remplirChamp("home-odds", match.homeOdds ?? "");
-        remplirChamp("draw-odds", match.drawOdds ?? "");
-        remplirChamp("away-odds", match.awayOdds ?? "");
-
-        matchEnModification = index;
-
-        const boutonAjouter =
-            document.getElementById("add-match");
-
-        if (boutonAjouter) {
-            boutonAjouter.textContent =
-                "Enregistrer les modifications";
-        }
+        editingMatchId = match.id;
+        addButton.textContent = "Enregistrer les modifications";
 
         window.scrollTo({
             top: 0,
@@ -340,113 +304,69 @@ async function synchroniserMatchsFirebase(matchs) {
         });
     }
 
-    function supprimerMatch(index) {
-
-        const matchs = obtenirMatchs();
-
+    async function supprimerMatch(matchId) {
         if (!confirm("Veux-tu vraiment supprimer ce match ?")) {
             return;
         }
 
-        matchs.splice(index, 1);
-
-        enregistrerMatchs(matchs);
-
-        if (matchEnModification === index) {
-
-            matchEnModification = null;
-
-            viderFormulaire();
-
-            const boutonAjouter =
-                document.getElementById("add-match");
-
-            if (boutonAjouter) {
-                boutonAjouter.textContent =
-                    "Ajouter le match";
-            }
-
-        } else if (
-            matchEnModification !== null &&
-            matchEnModification > index
-        ) {
-            matchEnModification--;
-        }
-
-        afficherMatchs();
-    }
-
-    function obtenirMatchs() {
-
         try {
-            return JSON.parse(
-                localStorage.getItem("adminMatches")
-            ) || [];
-        } catch (erreur) {
-            console.error(
-                "Erreur lors de la lecture des matchs :",
-                erreur
+            await firestoreModule.deleteDoc(
+                firestoreModule.doc(db, "matches", matchId)
             );
 
-            return [];
+            if (editingMatchId === matchId) {
+                editingMatchId = null;
+                viderFormulaire();
+            }
+        } catch (erreur) {
+            console.error(erreur);
+            alert("Impossible de supprimer le match.");
         }
     }
 
-    function enregistrerMatchs(matchs) {
-
-    localStorage.setItem(
-        "adminMatches",
-        JSON.stringify(matchs)
-    );
-
-    synchroniserMatchsFirebase(matchs);
-}
-
     function lireChamp(id) {
-
-        const champ = document.getElementById(id);
-
-        if (!champ) {
-            return "";
-        }
-
-        return champ.value.trim();
+        return document.getElementById(id)?.value.trim() || "";
     }
 
     function lireNombre(id) {
+        const valeur = document.getElementById(id)?.value.trim();
 
-        const champ = document.getElementById(id);
-
-        if (!champ) {
+        if (!valeur) {
             return null;
         }
 
-        if (champ.value.trim() === "") {
-            return 0;
-        }
+        const nombre = Number(valeur);
 
-        return Number(champ.value);
+        return Number.isFinite(nombre) ? nombre : null;
     }
 
     function remplirChamp(id, valeur) {
-
         const champ = document.getElementById(id);
 
         if (champ) {
-            champ.value = valeur;
+            champ.value = valeur ?? "";
         }
     }
 
     function viderFormulaire() {
-
         remplirChamp("home-team", "");
         remplirChamp("away-team", "");
         remplirChamp("match-date", "");
         remplirChamp("match-time", "");
-
         remplirChamp("home-odds", "");
         remplirChamp("draw-odds", "");
         remplirChamp("away-odds", "");
+
+        editingMatchId = null;
+        addButton.textContent = "Ajouter le match";
     }
 
+    function echapper(valeur) {
+        return String(valeur ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
 });
