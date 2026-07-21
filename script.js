@@ -8,6 +8,87 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let matches = loadAdminMatches();
 
+    let matches = [];
+let arreterEcouteMatchs = null;
+
+async function chargerMatchsFirebase() {
+    try {
+        const [appModule, firestoreModule] = await Promise.all([
+            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+            import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+        ]);
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
+            authDomain: "mon-petit-majean-82a7d.firebaseapp.com",
+            projectId: "mon-petit-majean-82a7d",
+            storageBucket: "mon-petit-majean-82a7d.firebasestorage.app",
+            messagingSenderId: "687822253256",
+            appId: "1:687822253256:web:18f9a763fa3522f90e09fd"
+        };
+
+        const app = appModule.getApps().length
+            ? appModule.getApp()
+            : appModule.initializeApp(firebaseConfig);
+
+        const db = firestoreModule.getFirestore(app);
+
+        const collectionMatchs =
+            firestoreModule.collection(db, "matches");
+
+        arreterEcouteMatchs = firestoreModule.onSnapshot(
+            collectionMatchs,
+
+            function (snapshot) {
+                matches = snapshot.docs
+                    .map(function (document, index) {
+                        return convertAdminMatch(
+                            {
+                                id: document.id,
+                                ...document.data()
+                            },
+                            index
+                        );
+                    })
+                    .sort(function (premierMatch, deuxiemeMatch) {
+                        const dateA = premierMatch.kickoff || "";
+                        const dateB = deuxiemeMatch.kickoff || "";
+
+                        return dateA.localeCompare(dateB);
+                    });
+
+                console.log(
+                    `✅ ${matches.length} match(s) chargé(s) depuis Firebase`
+                );
+
+                renderMatches();
+                renderMyPredictions();
+            },
+
+            function (erreur) {
+                console.error(
+                    "Impossible de charger les matchs Firebase :",
+                    erreur
+                );
+
+                if (matchesContainer) {
+                    matchesContainer.innerHTML = `
+                        <p>
+                            Impossible de charger les matchs.
+                            Recharge la page.
+                        </p>
+                    `;
+                }
+            }
+        );
+    } catch (erreur) {
+        console.error(
+            "Erreur pendant le chargement de Firebase :",
+            erreur
+        );
+    }
+}
+
     function loadAdminMatches() {
         try {
             const savedData = localStorage.getItem(ADMIN_MATCHES_KEY);
