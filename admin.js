@@ -9,6 +9,81 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let matchEnModification = null;
 
+    let firebaseCloud = null;
+
+chargerFirebase();
+
+async function chargerFirebase() {
+    try {
+        const [appModule, authModule, firestoreModule] =
+            await Promise.all([
+                import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+                import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+                import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+            ]);
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYWClCA7W4d1WZDt3gpTMOgtc6UNfqRcQ",
+            authDomain: "mon-petit-majean-82a7d.firebaseapp.com",
+            projectId: "mon-petit-majean-82a7d",
+            storageBucket: "mon-petit-majean-82a7d.firebasestorage.app",
+            messagingSenderId: "687822253256",
+            appId: "1:687822253256:web:18f9a763fa3522f90e09fd"
+        };
+
+        const app = appModule.initializeApp(firebaseConfig);
+        const auth = authModule.getAuth(app);
+        const db = firestoreModule.getFirestore(app);
+
+        firebaseCloud = {
+            auth,
+            db,
+            firestoreModule
+        };
+
+        console.log("✅ Firebase chargé dans l’admin");
+    } catch (erreur) {
+        console.error("Firebase indisponible :", erreur);
+    }
+}
+
+async function synchroniserMatchsFirebase(matchs) {
+    if (!firebaseCloud) {
+        console.warn("Firebase n’est pas encore chargé.");
+        return;
+    }
+
+    const { auth, db, firestoreModule } = firebaseCloud;
+
+    try {
+        await auth.authStateReady();
+
+        if (!auth.currentUser) {
+            console.warn(
+                "Connecte-toi d’abord sur le site principal avec ton compte Firebase."
+            );
+            return;
+        }
+
+        await firestoreModule.setDoc(
+            firestoreModule.doc(db, "appData", "matches"),
+            {
+                matches: matchs,
+                updatedAt: firestoreModule.serverTimestamp(),
+                updatedBy: auth.currentUser.uid
+            },
+            { merge: true }
+        );
+
+        console.log("✅ Matchs envoyés dans Firebase");
+    } catch (erreur) {
+        console.error(
+            "Erreur pendant l’envoi des matchs dans Firebase :",
+            erreur
+        );
+    }
+}
+
     if (!loginButton || !passwordInput || !loginBox || !adminPanel) {
         console.error("Éléments de connexion admin introuvables.");
         return;
@@ -319,11 +394,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function enregistrerMatchs(matchs) {
 
-        localStorage.setItem(
-            "adminMatches",
-            JSON.stringify(matchs)
-        );
-    }
+    localStorage.setItem(
+        "adminMatches",
+        JSON.stringify(matchs)
+    );
+
+    synchroniserMatchsFirebase(matchs);
+}
 
     function lireChamp(id) {
 
