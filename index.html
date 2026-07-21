@@ -2,24 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Mon Petit Majean, jeu privé de pronostics sur la Ligue des champions."
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mon Petit Majean, jeu privé de pronostics sur la Ligue des champions.">
     <title>Mon Petit Majean</title>
-
-    <link rel="stylesheet" href="./style.css?v=75">
+    <link rel="stylesheet" href="./style.css?v=76">
 </head>
-
 <body>
-
     <div class="page-background" aria-hidden="true">
         <div class="background-glow background-glow-left"></div>
         <div class="background-glow background-glow-right"></div>
@@ -27,294 +15,119 @@
     </div>
 
     <header class="site-header">
-
         <div class="header-inner">
-
             <a class="brand" href="#matchs">
-                <span class="brand-emblem">
-                    ★
-                </span>
-
+                <span class="brand-emblem">★</span>
                 <span class="brand-copy">
                     <small>Ligue des champions</small>
                     <strong>Mon Petit Majean</strong>
                 </span>
             </a>
 
-            <div class="header-player">
-                <span class="player-avatar">
-                    L
-                </span>
-
-                <span class="player-copy">
-                    <small>Joueur</small>
-                    <strong>Louis</strong>
-                </span>
+            <div class="header-actions">
+                <button id="auth-open-button" class="header-auth-button" type="button">Connexion</button>
+                <button id="logout-button" class="header-auth-button auth-hidden" type="button">Déconnexion</button>
+                <div class="header-player">
+                    <span class="player-avatar" data-player-avatar>?</span>
+                    <span class="player-copy">
+                        <small>Joueur</small>
+                        <strong data-player-name>Connexion</strong>
+                    </span>
+                </div>
             </div>
-
         </div>
-
     </header>
 
     <main class="site-main">
-
         <section class="hero">
-
             <div class="hero-content">
-
-                <p class="section-kicker">
-                    Soirées européennes
-                </p>
-
-                <h1>
-                    Pronostique la
-                    <span>Ligue des champions</span>
-                </h1>
-
-                <p class="hero-text">
-                    Trouve le bon résultat pour gagner les points
-                    de la cote. Trouve le score exact et décroche
-                    150 points supplémentaires.
-                </p>
-
-                <a class="hero-button" href="#matchs">
-                    Faire mes pronostics
-                </a>
-
+                <p class="section-kicker">Soirées européennes</p>
+                <h1>Pronostique la <span>Ligue des champions</span></h1>
+                <p class="hero-text">Trouve le bon résultat pour gagner les points de la cote. Trouve le score exact et décroche 150 points supplémentaires.</p>
+                <a class="hero-button" href="#matchs">Faire mes pronostics</a>
             </div>
 
             <div class="hero-panel">
-
-                <span class="hero-panel-label">
-                    Ma performance
-                </span>
-
-                <strong class="hero-panel-rank">
-                    #2
-                </strong>
-
-                <span class="hero-panel-score">
-                    2 210 points
-                </span>
-
+                <span class="hero-panel-label">Ma performance</span>
+                <strong class="hero-panel-rank">—</strong>
+                <span class="hero-panel-score">0 point</span>
                 <div class="hero-panel-line"></div>
-
-                <span class="hero-panel-note">
-                    11 bons pronostics
-                </span>
-
+                <span class="hero-panel-note">Connecte-toi pour jouer</span>
             </div>
-
         </section>
 
         <nav class="main-tabs" aria-label="Navigation principale">
-
-            <a class="main-tab active" href="#matchs">
-                Matchs
-            </a>
-
-            <a class="main-tab" href="#mes-pronos">
-                Mes pronos
-            </a>
-
-            <a class="main-tab" href="#classement">
-                Classement
-            </a>
-
-            <a class="main-tab" href="#profil">
-                Profil
-            </a>
-
+            <a class="main-tab active" href="#matchs">Matchs</a>
+            <a class="main-tab" href="#mes-pronos">Mes pronos</a>
+            <a class="main-tab" href="#classement">Classement</a>
+            <a class="main-tab" href="#profil">Profil</a>
         </nav>
 
         <section id="matchs" class="page-section">
-
             <div class="section-header">
-
-                <div>
-                    <p class="section-kicker">
-                        Prochaine journée
-                    </p>
-
-                    <h2>
-                        Matchs à pronostiquer
-                    </h2>
-                </div>
-
-                <span class="section-counter" id="match-count">
-                    0 match
-                </span>
-
+                <div><p class="section-kicker">Prochaine journée</p><h2>Matchs à pronostiquer</h2></div>
+                <span class="section-counter" id="match-count">0 match</span>
             </div>
-
-            <div
-                id="matches-container"
-                class="matches-container"
-            >
-                <div class="loading-card">
-                    Chargement des matchs…
-                </div>
-            </div>
-
+            <div id="matches-container" class="matches-container"><div class="loading-card">Chargement des matchs…</div></div>
         </section>
 
         <section id="mes-pronos" class="page-section">
-
-            <div class="section-header">
-
-                <div>
-                    <p class="section-kicker">
-                        Mes choix
-                    </p>
-
-                    <h2>
-                        Mes pronostics
-                    </h2>
-                </div>
-
-            </div>
-
-            <div
-                id="my-predictions-container"
-                class="predictions-container"
-            >
-                <div class="empty-card">
-                    Aucun pronostic enregistré.
-                </div>
-            </div>
-
+            <div class="section-header"><div><p class="section-kicker">Mes choix</p><h2>Mes pronostics</h2></div></div>
+            <div id="my-predictions-container" class="predictions-container"><div class="empty-card">Connecte-toi pour retrouver tes pronostics.</div></div>
         </section>
 
         <section id="classement" class="page-section">
-
-            <div class="section-header">
-
-                <div>
-                    <p class="section-kicker">
-                        Ligue privée
-                    </p>
-
-                    <h2>
-                        Classement général
-                    </h2>
-                </div>
-
-            </div>
-
+            <div class="section-header"><div><p class="section-kicker">Ligue privée</p><h2>Classement général</h2></div></div>
             <div class="ranking-board">
-
-                <article class="ranking-entry ranking-entry-gold">
-
-                    <span class="ranking-position">
-                        1
-                    </span>
-
-                    <span class="ranking-icon">
-                        ★
-                    </span>
-
-                    <div class="ranking-person">
-                        <strong>Thomas</strong>
-                        <span>12 bons pronostics</span>
-                    </div>
-
-                    <strong class="ranking-points">
-                        2 450 pts
-                    </strong>
-
-                </article>
-
-                <article class="ranking-entry ranking-entry-current">
-
-                    <span class="ranking-position">
-                        2
-                    </span>
-
-                    <span class="ranking-icon">
-                        ★
-                    </span>
-
-                    <div class="ranking-person">
-                        <strong>Louis</strong>
-                        <span>11 bons pronostics</span>
-                    </div>
-
-                    <strong class="ranking-points">
-                        2 210 pts
-                    </strong>
-
-                </article>
-
-                <article class="ranking-entry">
-
-                    <span class="ranking-position">
-                        3
-                    </span>
-
-                    <span class="ranking-icon">
-                        ★
-                    </span>
-
-                    <div class="ranking-person">
-                        <strong>Hugo</strong>
-                        <span>9 bons pronostics</span>
-                    </div>
-
-                    <strong class="ranking-points">
-                        1 980 pts
-                    </strong>
-
-                </article>
-
+                <div class="empty-card">Le classement sera ajouté après la sauvegarde des comptes et des résultats.</div>
             </div>
-
         </section>
 
         <section id="profil" class="page-section">
-
-            <div class="section-header">
-
-                <div>
-                    <p class="section-kicker">
-                        Mon compte
-                    </p>
-
-                    <h2>
-                        Profil
-                    </h2>
-                </div>
-
-            </div>
-
+            <div class="section-header"><div><p class="section-kicker">Mon compte</p><h2>Profil</h2></div></div>
             <article class="profile-panel">
-
-                <span class="profile-avatar">
-                    L
-                </span>
-
+                <span class="profile-avatar" data-player-avatar>?</span>
                 <div class="profile-identity">
-                    <strong>Louis</strong>
-                    <span>Joueur de la ligue privée</span>
+                    <strong data-player-name>Connexion</strong>
+                    <span id="profile-status">Connecte-toi pour sauvegarder tes pronostics</span>
                 </div>
-
-                <div class="profile-stat">
-                    <span>Points</span>
-                    <strong>2 210</strong>
-                </div>
-
+                <div class="profile-stat"><span>Points</span><strong>0</strong></div>
             </article>
-
         </section>
-
     </main>
 
-    <footer class="site-footer">
-        <p>
-            Jeu privé de pronostics, sans argent réel.
-        </p>
-    </footer>
+    <footer class="site-footer"><p>Jeu privé de pronostics, sans argent réel.</p></footer>
 
-    <script src="./script.js?v=28"></script>
+    <div id="auth-modal" class="auth-modal" aria-hidden="true">
+        <div class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+            <button id="auth-close-button" class="auth-close-button" type="button" aria-label="Fermer">×</button>
+            <p class="section-kicker">Espace joueurs</p>
+            <h2 id="auth-title">Mon compte</h2>
 
+            <div class="auth-tabs">
+                <button id="show-login" class="auth-tab active" type="button">Connexion</button>
+                <button id="show-register" class="auth-tab" type="button">Inscription</button>
+            </div>
+
+            <p id="auth-message" class="auth-message" aria-live="polite"></p>
+
+            <form id="login-form" class="auth-form">
+                <label>Adresse e-mail<input name="email" type="email" autocomplete="email" required></label>
+                <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+                <button class="auth-submit-button" type="submit">Se connecter</button>
+            </form>
+
+            <form id="register-form" class="auth-form auth-form-hidden">
+                <label>Pseudo<input name="pseudo" type="text" minlength="2" maxlength="24" autocomplete="nickname" required></label>
+                <label>Adresse e-mail<input name="email" type="email" autocomplete="email" required></label>
+                <label>Mot de passe<input name="password" type="password" minlength="6" autocomplete="new-password" required></label>
+                <label>Confirmer le mot de passe<input name="confirmation" type="password" minlength="6" autocomplete="new-password" required></label>
+                <button class="auth-submit-button" type="submit">Créer mon compte</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="./firebase.js?v=1"></script>
+    <script src="./script.js?v=29"></script>
 </body>
 </html>
