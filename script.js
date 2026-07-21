@@ -222,19 +222,19 @@ recalculerTotalJoueur();
     }
 
     function getTeamLogo(teamName) {
-        const logos = {
-            parissg: "logos/psg.png",
-            psg: "logos/psg.png",
-            realmadrid: "logos/madrid.png",
-            manchestercity: "logos/manchester.png",
-            mancity: "logos/manchester.png",
-            intermilano: "logos/inter.png",
-            inter: "logos/inter.png",
-            rclens: "logos/rclens.png",
-            lens: "logos/rclens.png",
-            bayernmunich: "logos/munich.png",
-            bayern: "logos/munich.png",
-            arsenal: "logos/arsenal.png"
+        const logo = {
+            parissg: "logo/psg.png",
+            psg: "logo/psg.png",
+            realmadrid: "logo/madrid.png",
+            manchestercity: "logo/manchester.png",
+            mancity: "logo/manchester.png",
+            intermilano: "logo/inter.png",
+            inter: "logo/inter.png",
+            rclens: "logo/rclens.png",
+            lens: "logo/rclens.png",
+            bayernmunich: "logo/munich.png",
+            bayern: "logo/munich.png",
+            arsenal: "logo/arsenal.png"
         };
 
         return logos[normalizeTeamName(teamName)] || "";
