@@ -6,6 +6,24 @@
     <meta name="description" content="Mon Petit Majean, jeu privé de pronostics sur la Ligue des champions.">
     <title>Mon Petit Majean</title>
     <link rel="stylesheet" href="./style.css?v=77">
+
+    <style>
+      /* Fenêtre de connexion autonome : fonctionne même si Firebase ne charge pas */
+      #auth-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(1,3,13,.84)}
+      #auth-modal.auth-modal-open{display:flex!important}
+      #auth-modal .auth-dialog{position:relative;width:min(440px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:28px;border:1px solid rgba(255,255,255,.22);border-radius:22px;background:#0b1738;color:#fff;box-shadow:0 25px 80px rgba(0,0,0,.55)}
+      #auth-modal .auth-form{display:grid;gap:14px}
+      #auth-modal .auth-form-hidden{display:none!important}
+      #auth-modal .auth-form label{display:grid;gap:7px}
+      #auth-modal .auth-form input{box-sizing:border-box;width:100%;padding:12px;border:1px solid rgba(255,255,255,.25);border-radius:10px;background:#050c20;color:#fff}
+      #auth-modal .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:20px 0;padding:5px;border-radius:12px;background:#050c20}
+      #auth-modal .auth-tab,#auth-modal .auth-submit-button,#auth-modal .auth-close-button{border:0;color:#fff;cursor:pointer}
+      #auth-modal .auth-tab{padding:10px;border-radius:8px;background:transparent}
+      #auth-modal .auth-tab.active,#auth-modal .auth-submit-button{background:linear-gradient(105deg,#1f6fff,#7048e8)}
+      #auth-modal .auth-submit-button{padding:12px;border-radius:10px;font-weight:800}
+      #auth-modal .auth-close-button{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);font-size:24px}
+      body.modal-is-open{overflow:hidden}
+    </style>
 </head>
 <body>
     <div class="page-background" aria-hidden="true">
@@ -25,7 +43,7 @@
             </a>
 
             <div class="header-actions">
-                <button id="auth-open-button" class="header-auth-button" type="button">Connexion</button>
+                <button id="auth-open-button" class="header-auth-button" type="button" onclick="window.openAuthModalNow()">Connexion</button>
                 <button id="logout-button" class="header-auth-button auth-hidden" type="button">Déconnexion</button>
                 <div class="header-player">
                     <span class="player-avatar" data-player-avatar>?</span>
@@ -100,13 +118,13 @@
 
     <div id="auth-modal" class="auth-modal" aria-hidden="true">
         <div class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-            <button id="auth-close-button" class="auth-close-button" type="button" aria-label="Fermer">×</button>
+            <button id="auth-close-button" class="auth-close-button" type="button" onclick="window.closeAuthModalNow()" aria-label="Fermer">×</button>
             <p class="section-kicker">Espace joueurs</p>
             <h2 id="auth-title">Mon compte</h2>
 
             <div class="auth-tabs">
-                <button id="show-login" class="auth-tab active" type="button">Connexion</button>
-                <button id="show-register" class="auth-tab" type="button">Inscription</button>
+                <button id="show-login" class="auth-tab active" type="button" onclick="window.showAuthFormNow('login')">Connexion</button>
+                <button id="show-register" class="auth-tab" type="button" onclick="window.showAuthFormNow('register')">Inscription</button>
             </div>
 
             <p id="auth-message" class="auth-message" aria-live="polite"></p>
@@ -127,7 +145,42 @@
         </div>
     </div>
 
-    <script type="module" src="./firebase.js?v=2"></script>
+
+    <script>
+      // Ces fonctions ne dépendent PAS de Firebase. Le bouton ouvre toujours la fenêtre.
+      window.openAuthModalNow = function () {
+        var modal = document.getElementById('auth-modal');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        modal.classList.add('auth-modal-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-is-open');
+      };
+      window.closeAuthModalNow = function () {
+        var modal = document.getElementById('auth-modal');
+        if (!modal) return;
+        modal.style.display = 'none';
+        modal.classList.remove('auth-modal-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-is-open');
+      };
+      window.showAuthFormNow = function (mode) {
+        var login = document.getElementById('login-form');
+        var register = document.getElementById('register-form');
+        var loginTab = document.getElementById('show-login');
+        var registerTab = document.getElementById('show-register');
+        var isLogin = mode === 'login';
+        if (login) login.style.display = isLogin ? 'grid' : 'none';
+        if (register) register.style.display = isLogin ? 'none' : 'grid';
+        if (loginTab) loginTab.classList.toggle('active', isLogin);
+        if (registerTab) registerTab.classList.toggle('active', !isLogin);
+      };
+      document.addEventListener('click', function (event) {
+        var modal = document.getElementById('auth-modal');
+        if (event.target === modal) window.closeAuthModalNow();
+      });
+    </script>
+    <script type="module" src="./firebase.js?v=3"></script>
     <script src="./script.js?v=30"></script>
 </body>
 </html>
