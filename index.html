@@ -290,12 +290,31 @@
             </div>
 
             <div class="hero-panel">
-                <span class="hero-panel-label">Ma performance</span>
-                <strong class="hero-panel-rank">#2</strong>
-                <span class="hero-panel-score">2 210 points</span>
-                <div class="hero-panel-line"></div>
-                <span class="hero-panel-note">11 bons pronostics</span>
-            </div>
+    <span class="hero-panel-label">Ma performance</span>
+
+    <strong
+        class="hero-panel-rank"
+        id="current-player-rank"
+    >
+        #-
+    </strong>
+
+    <span
+        class="hero-panel-score"
+        id="current-player-points"
+    >
+        0 point
+    </span>
+
+    <div class="hero-panel-line"></div>
+
+    <span
+        class="hero-panel-note"
+        id="current-player-correct-predictions"
+    >
+        0 bon pronostic
+    </span>
+</div>
         </section>
 
         <nav class="main-tabs" aria-label="Navigation principale">
@@ -347,43 +366,14 @@
                 </div>
             </div>
 
-            <div class="ranking-board">
-                <article class="ranking-entry ranking-entry-gold">
-                    <span class="ranking-position">1</span>
-                    <span class="ranking-icon">★</span>
-
-                    <div class="ranking-person">
-                        <strong>Thomas</strong>
-                        <span>12 bons pronostics</span>
-                    </div>
-
-                    <strong class="ranking-points">2 450 pts</strong>
-                </article>
-
-                <article class="ranking-entry ranking-entry-current">
-                    <span class="ranking-position">2</span>
-                    <span class="ranking-icon">★</span>
-
-                    <div class="ranking-person">
-                        <strong>Louis</strong>
-                        <span>11 bons pronostics</span>
-                    </div>
-
-                    <strong class="ranking-points">2 210 pts</strong>
-                </article>
-
-                <article class="ranking-entry">
-                    <span class="ranking-position">3</span>
-                    <span class="ranking-icon">★</span>
-
-                    <div class="ranking-person">
-                        <strong>Hugo</strong>
-                        <span>9 bons pronostics</span>
-                    </div>
-
-                    <strong class="ranking-points">1 980 pts</strong>
-                </article>
-            </div>
+            <div
+    class="ranking-board"
+    id="ranking-container"
+>
+    <div class="loading-card">
+        Chargement du classement…
+    </div>
+</div>
         </section>
 
         <section id="profil" class="page-section">
@@ -407,9 +397,9 @@
                 </div>
 
                 <div class="profile-stat">
-                    <span>Points</span>
-                    <strong>2 210</strong>
-                </div>
+    <span>Points</span>
+    <strong id="profile-points">0</strong>
+</div>
             </article>
         </section>
 
