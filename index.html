@@ -18,43 +18,52 @@
     <link rel="stylesheet" href="./style.css?v=75">
 
     <style>
-        /* Fenêtre de connexion : ajoutée sans modifier le design du site */
-        .auth-open-button {
+        /* Ajouts uniquement pour la connexion — le reste du design est conservé */
+        .auth-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-button {
             appearance: none;
-            border: 1px solid rgba(255,255,255,.18);
-            background: rgba(38, 84, 255, .18);
-            color: #fff;
+            border: 1px solid rgba(255, 255, 255, .16);
             border-radius: 999px;
             padding: 10px 16px;
+            background: rgba(49, 91, 255, .18);
+            color: #fff;
             font: inherit;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: transform .18s ease, background .18s ease;
         }
 
-        .auth-open-button:hover {
+        .auth-button:hover {
             transform: translateY(-1px);
-            background: rgba(68, 103, 255, .32);
+            background: rgba(73, 111, 255, .32);
         }
 
-        .auth-modal[hidden] {
-            display: none;
+        .auth-button-secondary {
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .auth-hidden {
+            display: none !important;
         }
 
         .auth-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            display: grid;
+            display: none;
             place-items: center;
             padding: 20px;
-        }
-
-        .auth-modal-backdrop {
-            position: absolute;
-            inset: 0;
             background: rgba(1, 5, 24, .78);
             backdrop-filter: blur(8px);
+        }
+
+        .auth-modal.auth-modal-open {
+            display: grid;
         }
 
         .auth-dialog {
@@ -62,14 +71,14 @@
             width: min(100%, 430px);
             max-height: calc(100vh - 40px);
             overflow-y: auto;
-            border: 1px solid rgba(255,255,255,.14);
+            border: 1px solid rgba(255, 255, 255, .14);
             border-radius: 22px;
+            padding: 26px;
             background:
                 radial-gradient(circle at top right, rgba(84, 75, 255, .25), transparent 40%),
                 #07112f;
             color: #fff;
-            box-shadow: 0 28px 80px rgba(0,0,0,.55);
-            padding: 26px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .55);
         }
 
         .auth-close-button {
@@ -80,7 +89,7 @@
             height: 38px;
             border: 0;
             border-radius: 50%;
-            background: rgba(255,255,255,.08);
+            background: rgba(255, 255, 255, .08);
             color: #fff;
             font-size: 24px;
             line-height: 1;
@@ -94,7 +103,7 @@
 
         .auth-subtitle {
             margin: 0 0 22px;
-            color: rgba(255,255,255,.68);
+            color: rgba(255, 255, 255, .68);
         }
 
         .auth-tabs {
@@ -104,7 +113,7 @@
             padding: 5px;
             margin-bottom: 20px;
             border-radius: 14px;
-            background: rgba(255,255,255,.06);
+            background: rgba(255, 255, 255, .06);
         }
 
         .auth-tab {
@@ -112,9 +121,9 @@
             border-radius: 10px;
             padding: 11px 12px;
             background: transparent;
-            color: rgba(255,255,255,.66);
+            color: rgba(255, 255, 255, .66);
             font: inherit;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
         }
 
@@ -128,7 +137,7 @@
             gap: 14px;
         }
 
-        .auth-form[hidden] {
+        .auth-form-hidden {
             display: none;
         }
 
@@ -139,24 +148,24 @@
 
         .auth-field span {
             font-size: 14px;
-            color: rgba(255,255,255,.8);
+            color: rgba(255, 255, 255, .8);
         }
 
         .auth-field input {
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid rgba(255,255,255,.14);
+            border: 1px solid rgba(255, 255, 255, .14);
             border-radius: 12px;
-            background: rgba(255,255,255,.07);
-            color: #fff;
             padding: 13px 14px;
+            background: rgba(255, 255, 255, .07);
+            color: #fff;
             font: inherit;
             outline: none;
         }
 
         .auth-field input:focus {
             border-color: #5d7cff;
-            box-shadow: 0 0 0 3px rgba(93,124,255,.14);
+            box-shadow: 0 0 0 3px rgba(93, 124, 255, .14);
         }
 
         .auth-submit-button {
@@ -172,13 +181,36 @@
 
         .auth-message {
             min-height: 20px;
-            margin: 2px 0 0;
-            color: #ffb3b3;
+            margin: 12px 0 0;
             font-size: 14px;
         }
 
-        body.auth-modal-open {
+        .auth-message-error {
+            color: #ffb3b3;
+        }
+
+        .auth-message-success {
+            color: #9ff1b5;
+        }
+
+        body.modal-is-open {
             overflow: hidden;
+        }
+
+        @media (max-width: 700px) {
+            .header-inner {
+                gap: 12px;
+            }
+
+            .auth-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .auth-button {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -192,13 +224,10 @@
     </div>
 
     <header class="site-header">
-
         <div class="header-inner">
 
             <a class="brand" href="#matchs">
-                <span class="brand-emblem">
-                    ★
-                </span>
+                <span class="brand-emblem">★</span>
 
                 <span class="brand-copy">
                     <small>Ligue des champions</small>
@@ -206,38 +235,43 @@
                 </span>
             </a>
 
-            <div class="header-player">
+            <div class="auth-actions">
                 <button
-                    class="auth-open-button"
-                    id="open-auth-modal"
+                    class="auth-button"
+                    id="auth-open-button"
                     type="button"
                 >
                     Connexion
                 </button>
 
-                <span class="player-avatar">
-                    L
-                </span>
+                <button
+                    class="auth-button auth-button-secondary auth-hidden"
+                    id="logout-button"
+                    type="button"
+                >
+                    Déconnexion
+                </button>
 
-                <span class="player-copy">
-                    <small>Joueur</small>
-                    <strong>Louis</strong>
-                </span>
+                <div class="header-player">
+                    <span class="player-avatar" data-player-avatar>
+                        ?
+                    </span>
+
+                    <span class="player-copy">
+                        <small>Joueur</small>
+                        <strong data-player-name>Connexion</strong>
+                    </span>
+                </div>
             </div>
 
         </div>
-
     </header>
 
     <main class="site-main">
 
         <section class="hero">
-
             <div class="hero-content">
-
-                <p class="section-kicker">
-                    Soirées européennes
-                </p>
+                <p class="section-kicker">Soirées européennes</p>
 
                 <h1>
                     Pronostique la
@@ -253,238 +287,136 @@
                 <a class="hero-button" href="#matchs">
                     Faire mes pronostics
                 </a>
-
             </div>
 
             <div class="hero-panel">
-
-                <span class="hero-panel-label">
-                    Ma performance
-                </span>
-
-                <strong class="hero-panel-rank">
-                    #2
-                </strong>
-
-                <span class="hero-panel-score">
-                    2 210 points
-                </span>
-
+                <span class="hero-panel-label">Ma performance</span>
+                <strong class="hero-panel-rank">#2</strong>
+                <span class="hero-panel-score">2 210 points</span>
                 <div class="hero-panel-line"></div>
-
-                <span class="hero-panel-note">
-                    11 bons pronostics
-                </span>
-
+                <span class="hero-panel-note">11 bons pronostics</span>
             </div>
-
         </section>
 
         <nav class="main-tabs" aria-label="Navigation principale">
-
-            <a class="main-tab active" href="#matchs">
-                Matchs
-            </a>
-
-            <a class="main-tab" href="#mes-pronos">
-                Mes pronos
-            </a>
-
-            <a class="main-tab" href="#classement">
-                Classement
-            </a>
-
-            <a class="main-tab" href="#profil">
-                Profil
-            </a>
-
+            <a class="main-tab active" href="#matchs">Matchs</a>
+            <a class="main-tab" href="#mes-pronos">Mes pronos</a>
+            <a class="main-tab" href="#classement">Classement</a>
+            <a class="main-tab" href="#profil">Profil</a>
         </nav>
 
         <section id="matchs" class="page-section">
-
             <div class="section-header">
-
                 <div>
-                    <p class="section-kicker">
-                        Prochaine journée
-                    </p>
-
-                    <h2>
-                        Matchs à pronostiquer
-                    </h2>
+                    <p class="section-kicker">Prochaine journée</p>
+                    <h2>Matchs à pronostiquer</h2>
                 </div>
 
                 <span class="section-counter" id="match-count">
                     0 match
                 </span>
-
             </div>
 
-            <div
-                id="matches-container"
-                class="matches-container"
-            >
+            <div id="matches-container" class="matches-container">
                 <div class="loading-card">
                     Chargement des matchs…
                 </div>
             </div>
-
         </section>
 
         <section id="mes-pronos" class="page-section">
-
             <div class="section-header">
-
                 <div>
-                    <p class="section-kicker">
-                        Mes choix
-                    </p>
-
-                    <h2>
-                        Mes pronostics
-                    </h2>
+                    <p class="section-kicker">Mes choix</p>
+                    <h2>Mes pronostics</h2>
                 </div>
-
             </div>
 
-            <div
-                id="my-predictions-container"
-                class="predictions-container"
-            >
+            <div id="my-predictions-container" class="predictions-container">
                 <div class="empty-card">
                     Aucun pronostic enregistré.
                 </div>
             </div>
-
         </section>
 
         <section id="classement" class="page-section">
-
             <div class="section-header">
-
                 <div>
-                    <p class="section-kicker">
-                        Ligue privée
-                    </p>
-
-                    <h2>
-                        Classement général
-                    </h2>
+                    <p class="section-kicker">Ligue privée</p>
+                    <h2>Classement général</h2>
                 </div>
-
             </div>
 
             <div class="ranking-board">
-
                 <article class="ranking-entry ranking-entry-gold">
-
-                    <span class="ranking-position">
-                        1
-                    </span>
-
-                    <span class="ranking-icon">
-                        ★
-                    </span>
+                    <span class="ranking-position">1</span>
+                    <span class="ranking-icon">★</span>
 
                     <div class="ranking-person">
                         <strong>Thomas</strong>
                         <span>12 bons pronostics</span>
                     </div>
 
-                    <strong class="ranking-points">
-                        2 450 pts
-                    </strong>
-
+                    <strong class="ranking-points">2 450 pts</strong>
                 </article>
 
                 <article class="ranking-entry ranking-entry-current">
-
-                    <span class="ranking-position">
-                        2
-                    </span>
-
-                    <span class="ranking-icon">
-                        ★
-                    </span>
+                    <span class="ranking-position">2</span>
+                    <span class="ranking-icon">★</span>
 
                     <div class="ranking-person">
                         <strong>Louis</strong>
                         <span>11 bons pronostics</span>
                     </div>
 
-                    <strong class="ranking-points">
-                        2 210 pts
-                    </strong>
-
+                    <strong class="ranking-points">2 210 pts</strong>
                 </article>
 
                 <article class="ranking-entry">
-
-                    <span class="ranking-position">
-                        3
-                    </span>
-
-                    <span class="ranking-icon">
-                        ★
-                    </span>
+                    <span class="ranking-position">3</span>
+                    <span class="ranking-icon">★</span>
 
                     <div class="ranking-person">
                         <strong>Hugo</strong>
                         <span>9 bons pronostics</span>
                     </div>
 
-                    <strong class="ranking-points">
-                        1 980 pts
-                    </strong>
-
+                    <strong class="ranking-points">1 980 pts</strong>
                 </article>
-
             </div>
-
         </section>
 
         <section id="profil" class="page-section">
-
             <div class="section-header">
-
                 <div>
-                    <p class="section-kicker">
-                        Mon compte
-                    </p>
-
-                    <h2>
-                        Profil
-                    </h2>
+                    <p class="section-kicker">Mon compte</p>
+                    <h2>Profil</h2>
                 </div>
-
             </div>
 
             <article class="profile-panel">
-
-                <span class="profile-avatar">
-                    L
+                <span class="profile-avatar" data-player-avatar>
+                    ?
                 </span>
 
                 <div class="profile-identity">
-                    <strong>Louis</strong>
-                    <span>Joueur de la ligue privée</span>
+                    <strong data-player-name>Connexion</strong>
+                    <span id="profile-status">
+                        Connecte-toi pour sauvegarder tes pronostics
+                    </span>
                 </div>
 
                 <div class="profile-stat">
                     <span>Points</span>
                     <strong>2 210</strong>
                 </div>
-
             </article>
-
         </section>
 
     </main>
 
     <footer class="site-footer">
-        <p>
-            Jeu privé de pronostics, sans argent réel.
-        </p>
+        <p>Jeu privé de pronostics, sans argent réel.</p>
     </footer>
 
     <div
@@ -492,15 +424,13 @@
         id="auth-modal"
         role="dialog"
         aria-modal="true"
+        aria-hidden="true"
         aria-labelledby="auth-modal-title"
-        hidden
     >
-        <div class="auth-modal-backdrop" data-close-auth></div>
-
         <div class="auth-dialog">
             <button
                 class="auth-close-button"
-                id="close-auth-modal"
+                id="auth-close-button"
                 type="button"
                 aria-label="Fermer"
             >
@@ -518,7 +448,7 @@
             <div class="auth-tabs">
                 <button
                     class="auth-tab active"
-                    id="login-tab"
+                    id="show-login"
                     type="button"
                 >
                     Connexion
@@ -526,7 +456,7 @@
 
                 <button
                     class="auth-tab"
-                    id="register-tab"
+                    id="show-register"
                     type="button"
                 >
                     Créer un compte
@@ -537,7 +467,6 @@
                 <label class="auth-field">
                     <span>Adresse e-mail</span>
                     <input
-                        id="login-email"
                         name="email"
                         type="email"
                         autocomplete="email"
@@ -548,7 +477,6 @@
                 <label class="auth-field">
                     <span>Mot de passe</span>
                     <input
-                        id="login-password"
                         name="password"
                         type="password"
                         autocomplete="current-password"
@@ -562,14 +490,17 @@
                 </button>
             </form>
 
-            <form class="auth-form" id="register-form" hidden>
+            <form
+                class="auth-form auth-form-hidden"
+                id="register-form"
+            >
                 <label class="auth-field">
                     <span>Pseudo</span>
                     <input
-                        id="register-name"
-                        name="name"
+                        name="pseudo"
                         type="text"
                         autocomplete="nickname"
+                        minlength="2"
                         required
                     >
                 </label>
@@ -577,7 +508,6 @@
                 <label class="auth-field">
                     <span>Adresse e-mail</span>
                     <input
-                        id="register-email"
                         name="email"
                         type="email"
                         autocomplete="email"
@@ -588,8 +518,18 @@
                 <label class="auth-field">
                     <span>Mot de passe</span>
                     <input
-                        id="register-password"
                         name="password"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+                </label>
+
+                <label class="auth-field">
+                    <span>Confirmer le mot de passe</span>
+                    <input
+                        name="confirmation"
                         type="password"
                         autocomplete="new-password"
                         minlength="6"
@@ -606,80 +546,8 @@
         </div>
     </div>
 
-    <script>
-        /* Cette partie ouvre la fenêtre sans dépendre de Firebase */
-        (() => {
-            const modal = document.getElementById("auth-modal");
-            const openButton = document.getElementById("open-auth-modal");
-            const closeButton = document.getElementById("close-auth-modal");
-            const loginTab = document.getElementById("login-tab");
-            const registerTab = document.getElementById("register-tab");
-            const loginForm = document.getElementById("login-form");
-            const registerForm = document.getElementById("register-form");
-            const loginEmail = document.getElementById("login-email");
-            const message = document.getElementById("auth-message");
-
-            function openModal() {
-                modal.hidden = false;
-                document.body.classList.add("auth-modal-open");
-                message.textContent = "";
-                window.setTimeout(() => loginEmail.focus(), 50);
-            }
-
-            function closeModal() {
-                modal.hidden = true;
-                document.body.classList.remove("auth-modal-open");
-            }
-
-            function showLogin() {
-                loginTab.classList.add("active");
-                registerTab.classList.remove("active");
-                loginForm.hidden = false;
-                registerForm.hidden = true;
-                message.textContent = "";
-            }
-
-            function showRegister() {
-                registerTab.classList.add("active");
-                loginTab.classList.remove("active");
-                registerForm.hidden = false;
-                loginForm.hidden = true;
-                message.textContent = "";
-            }
-
-            openButton.addEventListener("click", openModal);
-            closeButton.addEventListener("click", closeModal);
-            loginTab.addEventListener("click", showLogin);
-            registerTab.addEventListener("click", showRegister);
-
-            modal.addEventListener("click", (event) => {
-                if (event.target.hasAttribute("data-close-auth")) {
-                    closeModal();
-                }
-            });
-
-            document.addEventListener("keydown", (event) => {
-                if (event.key === "Escape" && !modal.hidden) {
-                    closeModal();
-                }
-            });
-
-            /* En attendant le branchement Firebase, on empêche le rechargement */
-            loginForm.addEventListener("submit", (event) => {
-                event.preventDefault();
-                message.textContent =
-                    "La fenêtre fonctionne. Il reste à brancher Firebase à ce formulaire.";
-            });
-
-            registerForm.addEventListener("submit", (event) => {
-                event.preventDefault();
-                message.textContent =
-                    "La fenêtre fonctionne. Il reste à brancher Firebase à ce formulaire.";
-            });
-        })();
-    </script>
-
     <script src="./script.js?v=28"></script>
+    <script src="./firebase.js?v=2"></script>
 
 </body>
 </html>
