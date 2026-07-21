@@ -265,6 +265,32 @@ document.addEventListener("DOMContentLoaded", async function () {
                     ✏️ Modifier
                 </button>
 
+                <br><br>
+
+<label>Score final :</label>
+
+<input
+    type="number"
+    min="0"
+    id="home-score-${match.id}"
+    value="${match.homeScore ?? ""}"
+    style="width:55px;">
+
+-
+
+<input
+    type="number"
+    min="0"
+    id="away-score-${match.id}"
+    value="${match.awayScore ?? ""}"
+    style="width:55px;">
+
+<button
+    type="button"
+    class="save-score-button">
+    💾 Score
+</button>
+
                 <button type="button" class="delete-match-button">
                     🗑️ Supprimer
                 </button>
@@ -281,6 +307,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 .addEventListener("click", function () {
                     supprimerMatch(match.id);
                 });
+
+            carte
+    .querySelector(".save-score-button")
+    .addEventListener("click", function () {
+
+        enregistrerScore(match.id);
+
+    });
 
             matchesList.appendChild(carte);
         });
@@ -324,6 +358,58 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    async function enregistrerScore(matchId) {
+
+    const homeScore = Number(
+        document.getElementById(
+            `home-score-${matchId}`
+        ).value
+    );
+
+    const awayScore = Number(
+        document.getElementById(
+            `away-score-${matchId}`
+        ).value
+    );
+
+    if (
+        Number.isNaN(homeScore) ||
+        Number.isNaN(awayScore)
+    ) {
+        alert("Entre les deux scores.");
+        return;
+    }
+
+    try {
+
+        await firestoreModule.updateDoc(
+
+            firestoreModule.doc(
+                db,
+                "matches",
+                matchId
+            ),
+
+            {
+                homeScore,
+                awayScore,
+                updatedAt:
+                    firestoreModule.serverTimestamp()
+            }
+
+        );
+
+        alert("✅ Score enregistré");
+
+    } catch (erreur) {
+
+        console.error(erreur);
+
+        alert("Impossible d'enregistrer le score.");
+
+    }
+
+}
     function lireChamp(id) {
         return document.getElementById(id)?.value.trim() || "";
     }
