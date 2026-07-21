@@ -1054,16 +1054,13 @@ async function chargerMatchsFirebase() {
         return new Date() >= kickoffDate;
     }
 
-    window.addEventListener("storage", (event) => {
-        if (event.key !== ADMIN_MATCHES_KEY) return;
-
-        matches = loadAdminMatches();
-        renderMatches();
-        renderMyPredictions();
-    });
-
     renderMatches();
-    renderMyPredictions();
-    bindNavigationTabs();
+renderMyPredictions();
+bindNavigationTabs();
+chargerMatchsFirebase();
 
+window.addEventListener("beforeunload", function () {
+    if (arreterEcouteMatchs) {
+        arreterEcouteMatchs();
+    }
 });
