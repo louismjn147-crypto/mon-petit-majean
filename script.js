@@ -420,7 +420,6 @@ function ecouterPronosticsFirebase(userId) {
             {
     displayName: nomJoueur,
 
-    // Les deux champs restent synchronisés
     points: totalPoints,
     totalPoints: totalPoints,
 
@@ -430,11 +429,10 @@ function ecouterPronosticsFirebase(userId) {
 
     updatedAt:
         firebaseFirestoreModule.serverTimestamp()
+},
+{
+    merge: true
 }
-
-            {
-                merge: true
-            }
 
         );
 
