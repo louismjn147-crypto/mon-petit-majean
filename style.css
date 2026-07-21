@@ -1,988 +1,1467 @@
-document.addEventListener("DOMContentLoaded", () => {
-    "use strict";
+:root {
+    --bg: #020617;
+    --bg-soft: #07122f;
+    --panel: rgba(8, 20, 52, 0.94);
+    --panel-2: rgba(14, 31, 76, 0.92);
+    --blue: #2f7bff;
+    --blue-light: #78b8ff;
+    --purple: #6a48ff;
+    --text: #ffffff;
+    --muted: #93a4c7;
+    --border: rgba(128, 163, 235, 0.18);
+    --border-strong: rgba(128, 175, 255, 0.38);
+    --green: #2ed39a;
+    --red: #ff667d;
+    --gold: #ffd66d;
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.36);
+}
 
-    const EXACT_SCORE_BONUS = 150;
-    const STORAGE_KEY = "monPetitMajeanPredictionsV20";
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    const ADMIN_MATCHES_KEY = "adminMatches";
+html {
+    scroll-behavior: smooth;
+}
 
-    let matches = loadAdminMatches();
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 50% -10%, rgba(43, 104, 255, 0.28), transparent 36%),
+        linear-gradient(180deg, #03081d 0%, var(--bg) 55%, #01030d 100%);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-    function loadAdminMatches() {
-        try {
-            const savedData = localStorage.getItem(ADMIN_MATCHES_KEY);
-            if (!savedData) return [];
+body,
+button,
+input {
+    font: inherit;
+}
 
-            const adminMatches = JSON.parse(savedData);
-            if (!Array.isArray(adminMatches)) return [];
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
-            return adminMatches.map((match, index) =>
-                convertAdminMatch(match, index)
-            );
-        } catch (error) {
-            console.error("Erreur lors du chargement des matchs admin :", error);
-            return [];
-        }
+button,
+input {
+    border: 0;
+}
+
+button {
+    color: inherit;
+}
+
+/* FOND */
+
+.page-background {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.background-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.35;
+}
+
+.background-glow-left {
+    top: 110px;
+    left: -160px;
+    width: 430px;
+    height: 430px;
+    background: #2164ff;
+}
+
+.background-glow-right {
+    top: 560px;
+    right: -180px;
+    width: 450px;
+    height: 450px;
+    background: #633eff;
+}
+
+.stars-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0.34;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,.72) 1px, transparent 1px),
+        radial-gradient(circle, rgba(116,174,255,.65) 1px, transparent 1px);
+    background-position: 0 0, 28px 28px;
+    background-size: 70px 70px, 92px 92px;
+    mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,.75) 60%, transparent 100%);
+}
+
+/* HEADER */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    background: rgba(2, 6, 23, 0.88);
+    backdrop-filter: blur(18px);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(1120px, calc(100% - 32px));
+    min-height: 72px;
+    margin: 0 auto;
+}
+
+.brand,
+.header-player {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.brand-emblem,
+.player-avatar {
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    box-shadow: 0 8px 24px rgba(44, 94, 255, .28);
+    font-weight: 900;
+}
+
+.brand-emblem {
+    width: 41px;
+    height: 41px;
+}
+
+.player-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: .76rem;
+}
+
+.brand-copy,
+.player-copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-copy small,
+.player-copy small {
+    color: var(--muted);
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.brand-copy strong {
+    margin-top: 2px;
+    font-size: .95rem;
+}
+
+.player-copy strong {
+    margin-top: 2px;
+    font-size: .78rem;
+}
+
+.header-player {
+    padding: 6px 11px 6px 6px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(11, 24, 57, .78);
+}
+
+/* LAYOUT */
+
+.site-main {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 34px 0 76px;
+}
+
+.hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 235px;
+    align-items: center;
+    gap: 30px;
+    min-height: 330px;
+    padding: 42px;
+    overflow: hidden;
+    border: 1px solid rgba(136, 177, 255, .25);
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at 90% 5%, rgba(102, 67, 255, .40), transparent 33%),
+        radial-gradient(circle at 4% 96%, rgba(29, 103, 255, .30), transparent 40%),
+        linear-gradient(135deg, rgba(12, 38, 105, .98), rgba(17, 12, 66, .98));
+    box-shadow: var(--shadow);
+}
+
+.hero::after {
+    content: "★";
+    position: absolute;
+    right: 22px;
+    bottom: -85px;
+    color: rgba(255,255,255,.035);
+    font-size: 15rem;
+    line-height: 1;
+}
+
+.hero-content,
+.hero-panel {
+    position: relative;
+    z-index: 1;
+}
+
+.section-kicker {
+    color: var(--blue-light);
+    font-size: .63rem;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    max-width: 680px;
+    margin-top: 12px;
+    font-size: clamp(2.4rem, 5vw, 4.4rem);
+    line-height: .98;
+    letter-spacing: -.05em;
+}
+
+.hero h1 span {
+    display: block;
+    margin-top: 8px;
+    color: #cfe2ff;
+}
+
+.hero-text {
+    max-width: 620px;
+    margin-top: 20px;
+    color: #c6d2ef;
+    font-size: .94rem;
+    line-height: 1.72;
+}
+
+.hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 26px;
+    padding: 13px 20px;
+    border-radius: 10px;
+    background: linear-gradient(105deg, var(--blue), var(--purple));
+    box-shadow: 0 12px 28px rgba(44, 90, 255, .28);
+    font-size: .76rem;
+    font-weight: 900;
+    transition: transform .2s ease, filter .2s ease;
+}
+
+.hero-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+.hero-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 215px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 22px;
+    background: rgba(4, 12, 38, .50);
+    backdrop-filter: blur(16px);
+}
+
+.hero-panel-label,
+.hero-panel-note {
+    color: var(--muted);
+    font-size: .61rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.hero-panel-rank {
+    margin: 12px 0 3px;
+    font-size: 4.1rem;
+    line-height: 1;
+}
+
+.hero-panel-score {
+    color: var(--blue-light);
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+.hero-panel-line {
+    width: 100%;
+    height: 1px;
+    margin: 18px 0;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,.16), transparent);
+}
+
+/* NAV */
+
+.main-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 22px 0 46px;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(7, 15, 38, .86);
+    backdrop-filter: blur(16px);
+}
+
+.main-tab {
+    padding: 11px 12px;
+    border-radius: 9px;
+    color: var(--muted);
+    text-align: center;
+    font-size: .72rem;
+    font-weight: 800;
+    transition: color .2s ease, background .2s ease;
+}
+
+.main-tab:hover {
+    color: white;
+    background: rgba(255,255,255,.05);
+}
+
+.main-tab.active {
+    color: white;
+    background: linear-gradient(105deg, var(--blue), var(--purple));
+    box-shadow: 0 7px 18px rgba(45, 87, 255, .22);
+}
+
+/* SECTIONS */
+
+.page-section {
+    margin-top: 54px;
+    scroll-margin-top: 100px;
+}
+
+.section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.section-header h2 {
+    margin-top: 5px;
+    font-size: 1.55rem;
+    letter-spacing: -.035em;
+}
+
+.section-counter {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--blue-light);
+    background: rgba(36, 99, 220, .11);
+    font-size: .62rem;
+    font-weight: 900;
+}
+
+/* MATCHS */
+
+.matches-container {
+    display: grid;
+    gap: 14px;
+}
+
+.match-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(15,29,68,.98), rgba(6,14,36,.99));
+    box-shadow: 0 14px 34px rgba(0,0,0,.24);
+}
+
+.match-card-header,
+.match-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+    padding-bottom: 13px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.match-context {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--blue-light);
+    font-size: .60rem;
+    font-weight: 900;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+.champions-star {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(125,175,255,.30);
+    border-radius: 50%;
+    color: white;
+    background: rgba(37,101,224,.16);
+    font-size: .52rem;
+}
+
+.match-time {
+    color: var(--muted);
+    font-size: .61rem;
+    text-align: right;
+}
+
+/* Nouvelle disposition des pronostics */
+
+.teams-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.pronostic-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+}
+
+.pronostic-team-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.pronostic-team-name strong {
+    min-width: 0;
+    overflow: hidden;
+    font-size: .84rem;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team-badge {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(130,170,255,.30);
+    border-radius: 50%;
+    color: #d6e6ff;
+    background: radial-gradient(circle at 35% 25%, rgba(68,132,255,.34), rgba(10,24,59,.92));
+    font-size: .58rem;
+    font-weight: 900;
+}
+
+.pronostic-team-points {
+    margin-top: 8px;
+    padding: 5px 9px;
+    border: 1px solid rgba(86,144,255,.20);
+    border-radius: 999px;
+    color: var(--blue-light);
+    background: rgba(40,103,224,.10);
+    font-size: .56rem;
+    font-weight: 900;
+}
+
+.teams-versus {
+    align-self: center;
+    margin-top: 12px;
+    color: rgba(255,255,255,.36);
+    text-align: center;
+    font-size: .56rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+}
+
+.prediction-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(100%, 300px);
+    margin: 22px auto 0;
+    padding: 16px 18px;
+    border: 1px solid rgba(112,165,255,.28);
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(17,35,80,.86), rgba(5,13,35,.94));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 28px rgba(0,0,0,.18);
+}
+
+.prediction-label {
+    margin-bottom: 8px;
+    color: #d2e3ff;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+.score-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+}
+
+.score-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    width: 55px;
+    height: 46px;
+    padding: 0;
+    border: 1px solid rgba(113,159,255,.45);
+    border-radius: 9px;
+    outline: none;
+    color: white;
+    background: linear-gradient(180deg, #1b294f, #0b1229);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.42);
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 900;
+    transition: border .2s ease, box-shadow .2s ease;
+}
+
+.score-input::-webkit-inner-spin-button,
+.score-input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.score-input:focus {
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(69,137,255,.15), inset 0 2px 6px rgba(0,0,0,.35);
+}
+
+.score-separator {
+    color: rgba(255,255,255,.72);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.prediction-points {
+    min-height: 14px;
+    margin-top: 7px;
+    color: var(--blue-light);
+    text-align: center;
+    font-size: .54rem;
+    font-weight: 800;
+}
+
+.prediction-points span {
+    margin: 0 4px;
+    opacity: .45;
+}
+
+.match-rewards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 15px;
+}
+
+.reward-information {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: .57rem;
+}
+
+.reward-information strong {
+    color: var(--blue-light);
+}
+
+.save-prediction-button {
+    align-self: center;
+    min-width: 200px;
+    margin-top: 14px;
+    padding: 10px 18px;
+    border-radius: 9px;
+    background: linear-gradient(105deg, var(--blue), var(--purple));
+    box-shadow: 0 8px 20px rgba(48,85,255,.22);
+    cursor: pointer;
+    font-size: .64rem;
+    font-weight: 900;
+    transition: transform .2s ease, filter .2s ease;
+}
+
+.save-prediction-button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+
+/* Ancienne disposition conservée pour les pronostics enregistrés */
+
+.match-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 145px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.match-team {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 9px;
+}
+
+.match-team-home {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.match-team-away {
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.match-team-home .team-badge {
+    order: 3;
+}
+
+.team-name {
+    min-width: 0;
+    overflow: hidden;
+    font-size: .78rem;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team-odds {
+    flex: 0 0 auto;
+    padding: 4px 7px;
+    border: 1px solid rgba(72,136,255,.22);
+    border-radius: 7px;
+    color: var(--blue-light);
+    background: rgba(39,99,210,.09);
+    font-size: .56rem;
+    font-weight: 900;
+}
+
+.match-team-home .team-name {
+    order: 1;
+}
+
+.match-team-home .team-odds {
+    order: 2;
+}
+
+.prediction-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.saved-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.saved-score span {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 39px;
+    border: 1px solid rgba(113,159,255,.42);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #1b294f, #0b1229);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.42);
+    font-size: .95rem;
+    font-weight: 900;
+}
+
+.saved-score strong {
+    color: rgba(255,255,255,.7);
+    font-size: .82rem;
+}
+
+.saved-prediction-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.055);
+}
+
+.saved-points-information {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: .57rem;
+}
+
+.saved-points-information strong {
+    color: var(--blue-light);
+}
+
+.result-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: .57rem;
+    font-weight: 800;
+}
+
+.result-pending {
+    color: var(--muted);
+    background: rgba(255,255,255,.045);
+}
+
+.result-exact {
+    color: #baffdf;
+    background: rgba(43,214,152,.13);
+}
+
+.result-correct {
+    color: #cce1ff;
+    background: rgba(31,111,255,.15);
+}
+
+.result-wrong {
+    color: #ffd0d7;
+    background: rgba(255,100,120,.13);
+}
+
+.edit-prediction-button {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+    font-size: .58rem;
+    font-weight: 800;
+}
+
+.edit-prediction-button:hover {
+    color: white;
+    border-color: var(--border-strong);
+}
+
+/* MES PRONOSTICS */
+
+.predictions-container {
+    display: grid;
+    gap: 10px;
+}
+
+.prediction-summary {
+    display: grid;
+    grid-template-columns: 135px minmax(0,1fr) 150px;
+    align-items: center;
+    gap: 18px;
+    padding: 15px 17px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+}
+
+.prediction-summary-date {
+    display: flex;
+    flex-direction: column;
+}
+
+.prediction-summary-date span {
+    color: var(--blue-light);
+    font-size: .61rem;
+    font-weight: 900;
+}
+
+.prediction-summary-date small {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .57rem;
+}
+
+.prediction-summary-match {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 55px minmax(0,1fr);
+    align-items: center;
+    gap: 12px;
+}
+
+.summary-team {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    min-width: 0;
+}
+
+.summary-team-away {
+    justify-content: flex-start;
+}
+
+.summary-team-code {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(127,169,255,.25);
+    border-radius: 50%;
+    color: var(--blue-light);
+    background: rgba(43,105,221,.10);
+    font-size: .48rem;
+    font-weight: 900;
+}
+
+.summary-team strong {
+    min-width: 0;
+    overflow: hidden;
+    font-size: .69rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.summary-score {
+    padding: 7px 8px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: rgba(3,9,27,.62);
+    text-align: center;
+    font-size: .72rem;
+    font-weight: 900;
+}
+
+.prediction-summary-points {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.prediction-summary-points strong {
+    color: var(--blue-light);
+    font-size: .67rem;
+}
+
+.prediction-summary-points span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .55rem;
+}
+
+/* CLASSEMENT */
+
+.ranking-board {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--panel);
+}
+
+.ranking-entry {
+    display: grid;
+    grid-template-columns: 34px 34px minmax(0,1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 17px;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.ranking-entry:last-child {
+    border-bottom: none;
+}
+
+.ranking-entry-gold {
+    background: linear-gradient(90deg, rgba(255,213,106,.11), transparent 55%);
+}
+
+.ranking-entry-current {
+    background: linear-gradient(90deg, rgba(31,111,255,.19), rgba(111,76,255,.09));
+}
+
+.ranking-position {
+    color: var(--muted);
+    font-size: .76rem;
+    font-weight: 900;
+}
+
+.ranking-entry-gold .ranking-position,
+.ranking-entry-gold .ranking-icon {
+    color: var(--gold);
+}
+
+.ranking-icon {
+    color: var(--blue-light);
+    font-size: .86rem;
+}
+
+.ranking-person {
+    display: flex;
+    flex-direction: column;
+}
+
+.ranking-person strong {
+    font-size: .75rem;
+}
+
+.ranking-person span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .56rem;
+}
+
+.ranking-points {
+    color: var(--blue-light);
+    font-size: .70rem;
+}
+
+/* PROFIL */
+
+.profile-panel {
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--panel);
+}
+
+.profile-avatar {
+    display: grid;
+    place-items: center;
+    width: 49px;
+    height: 49px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    box-shadow: 0 9px 24px rgba(44,88,255,.25);
+    font-size: .86rem;
+    font-weight: 900;
+}
+
+.profile-identity {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-identity strong {
+    font-size: .85rem;
+}
+
+.profile-identity span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .62rem;
+}
+
+.profile-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.profile-stat span {
+    color: var(--muted);
+    font-size: .55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.profile-stat strong {
+    margin-top: 3px;
+    color: var(--blue-light);
+    font-size: 1rem;
+}
+
+/* MESSAGES ET FOOTER */
+
+.loading-card,
+.empty-card {
+    padding: 23px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    color: var(--muted);
+    background: rgba(7,15,38,.68);
+    text-align: center;
+    font-size: .68rem;
+}
+
+.site-footer {
+    padding: 28px 20px;
+    border-top: 1px solid rgba(255,255,255,.055);
+    color: var(--muted);
+    text-align: center;
+    font-size: .59rem;
+}
+
+/* TABLETTE */
+
+@media (max-width: 850px) {
+    .hero {
+        grid-template-columns: 1fr;
     }
 
-    function convertAdminMatch(match, index) {
-        const homeTeam = String(match.homeTeam || "Équipe domicile").trim();
-        const awayTeam = String(match.awayTeam || "Équipe extérieure").trim();
-        const rawDate = String(match.date || "").trim();
-        const rawTime = String(match.time || "").trim();
-
-        return {
-            id: match.id || createMatchId(homeTeam, awayTeam, rawDate, rawTime, index),
-            competition: "Ligue des champions",
-            stage: match.stage || "Phase de ligue",
-            date: formatMatchDate(rawDate),
-            time: formatMatchTime(rawTime),
-            kickoff: rawDate && rawTime ? `${rawDate}T${rawTime}:00` : null,
-            homeTeam,
-            homeShort: createTeamShortName(homeTeam),
-            homeLogo: getTeamLogo(homeTeam),
-            awayTeam,
-            awayShort: createTeamShortName(awayTeam),
-            awayLogo: getTeamLogo(awayTeam),
-            odds: {
-                home: Number(match.homeOdds) || 0,
-                draw: Number(match.drawOdds) || 0,
-                away: Number(match.awayOdds) || 0
-            },
-            finalScore:
-                match.homeScore !== undefined &&
-                match.homeScore !== null &&
-                match.homeScore !== "" &&
-                match.awayScore !== undefined &&
-                match.awayScore !== null &&
-                match.awayScore !== ""
-                    ? {
-                        home: Number(match.homeScore),
-                        away: Number(match.awayScore)
-                    }
-                    : null
-        };
+    .hero-panel {
+        min-height: 160px;
     }
 
-    function createMatchId(homeTeam, awayTeam, date, time, index) {
-        return `${homeTeam}-${awayTeam}-${date}-${time}-${index}`
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
+    .match-content {
+        grid-template-columns: minmax(0,1fr) 125px minmax(0,1fr);
+        gap: 10px;
     }
 
-    function createTeamShortName(teamName) {
-        const ignoredWords = ["fc", "cf", "ac", "as", "rc", "sc", "club"];
-        const words = teamName.split(/\s+/).filter(Boolean);
-        const usefulWords = words.filter(
-            (word) => !ignoredWords.includes(word.toLowerCase())
-        );
-        const sourceWords = usefulWords.length > 0 ? usefulWords : words;
-
-        if (sourceWords.length === 1) {
-            return sourceWords[0].slice(0, 3).toUpperCase();
-        }
-
-        return sourceWords
-            .map((word) => word.charAt(0))
-            .join("")
-            .slice(0, 3)
-            .toUpperCase();
+    .prediction-summary {
+        grid-template-columns: 110px minmax(0,1fr);
     }
 
-    function normalizeTeamName(teamName) {
-        return teamName
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9]/g, "");
+    .prediction-summary-points {
+        grid-column: 1 / -1;
+        align-items: flex-start;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,.055);
+        text-align: left;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    .header-inner,
+    .site-main {
+        width: min(100% - 20px, 1120px);
     }
 
-    function getTeamLogo(teamName) {
-        const logos = {
-            parissg: "logos/psg.png",
-            psg: "logos/psg.png",
-            realmadrid: "logos/madrid.png",
-            manchestercity: "logos/manchester.jpg",
-            mancity: "logos/manchester.jpg",
-            intermilano: "logos/inter.png",
-            inter: "logos/inter.png",
-            rclens: "logos/rclens.jpg",
-            lens: "logos/rclens.jpg",
-            bayernmunich: "logos/munich.jpg",
-            bayern: "logos/munich.jpg",
-            arsenal: "logos/arsenal.png"
-        };
-
-        return logos[normalizeTeamName(teamName)] || "";
+    .brand-copy small,
+    .player-copy small {
+        display: none;
     }
 
-    function formatMatchDate(dateText) {
-        if (!dateText) return "Date à définir";
-
-        const date = new Date(`${dateText}T12:00:00`);
-        if (Number.isNaN(date.getTime())) return dateText;
-
-        const formattedDate = date.toLocaleDateString("fr-FR", {
-            weekday: "long",
-            day: "numeric",
-            month: "long"
-        });
-
-        return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+    .site-main {
+        padding-top: 20px;
     }
 
-    function formatMatchTime(timeText) {
-        return timeText ? timeText.replace(":", "h") : "Heure à définir";
+    .hero {
+        min-height: auto;
+        padding: 28px 20px;
+        border-radius: 21px;
     }
 
-    function renderTeamLogo(logoPath, shortName, teamName) {
-        const safeShortName = escapeHtml(shortName || "?");
-
-        if (!logoPath) {
-            return `
-                <span
-                    class="team-logo-fallback"
-                    aria-label="${escapeHtml(teamName)}"
-                    style="width:42px;height:42px;min-width:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;background:rgba(255,255,255,0.12);"
-                >${safeShortName}</span>
-            `;
-        }
-
-        return `
-            <img
-                src="${escapeHtml(logoPath)}"
-                alt="${escapeHtml(teamName)}"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                style="width:42px;height:42px;max-width:42px;max-height:42px;object-fit:contain;display:block;"
-            >
-            <span
-                class="team-logo-fallback"
-                aria-hidden="true"
-                style="width:42px;height:42px;min-width:42px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:800;background:rgba(255,255,255,0.12);"
-            >${safeShortName}</span>
-        `;
+    .hero h1 {
+        font-size: 2.35rem;
     }
 
-    const matchesContainer = document.getElementById(
-        "matches-container"
-    );
-
-    const predictionsContainer = document.getElementById(
-        "my-predictions-container"
-    );
-
-    const matchCount = document.getElementById("match-count");
-
-    let predictions = loadPredictions();
-
-    function loadPredictions() {
-        try {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-
-            if (!savedData) {
-                return {};
-            }
-
-            const parsedData = JSON.parse(savedData);
-
-            if (
-                typeof parsedData !== "object" ||
-                parsedData === null ||
-                Array.isArray(parsedData)
-            ) {
-                return {};
-            }
-
-            return parsedData;
-        } catch (error) {
-            console.error(
-                "Erreur lors du chargement des pronostics :",
-                error
-            );
-
-            return {};
-        }
+    .hero-text {
+        font-size: .82rem;
     }
 
-    function savePredictions() {
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(predictions)
-            );
-        } catch (error) {
-            console.error(
-                "Erreur lors de l'enregistrement :",
-                error
-            );
-
-            alert(
-                "Le pronostic n'a pas pu être enregistré."
-            );
-        }
+    .main-tabs {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    function escapeHtml(value) {
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
+    .section-header h2 {
+        font-size: 1.32rem;
     }
 
-    function getMatchById(matchId) {
-        return matches.find((match) => match.id === matchId);
+    .match-card {
+        padding: 14px 12px;
     }
 
-    function isValidScore(score) {
-        return (
-            Number.isInteger(score) &&
-            score >= 0 &&
-            score <= 20
-        );
+    .match-card-header,
+    .match-topline {
+        align-items: flex-start;
     }
 
-    function getOutcome(homeScore, awayScore) {
-        if (homeScore > awayScore) {
-            return "home";
-        }
-
-        if (homeScore < awayScore) {
-            return "away";
-        }
-
-        return "draw";
+    .match-card-header .match-context,
+    .match-topline .match-context {
+        max-width: 50%;
     }
 
-    function getOutcomeLabel(match, outcome) {
-        if (outcome === "home") {
-            return `Victoire ${match.homeTeam}`;
-        }
-
-        if (outcome === "away") {
-            return `Victoire ${match.awayTeam}`;
-        }
-
-        return "Match nul";
+    .match-card-header .match-time,
+    .match-topline .match-time {
+        max-width: 50%;
+        line-height: 1.4;
     }
 
-    function getOutcomePoints(match, outcome) {
-        return match.odds[outcome];
+    .teams-line {
+        grid-template-columns: minmax(0,1fr) 26px minmax(0,1fr);
+        gap: 6px;
+        margin-top: 16px;
     }
 
-    function calculatePredictionResult(match, prediction) {
-        if (!match.finalScore) {
-            return {
-                status: "pending",
-                label: "Résultat en attente",
-                points: null
-            };
-        }
-
-        const realHomeScore = match.finalScore.home;
-        const realAwayScore = match.finalScore.away;
-
-        const realOutcome = getOutcome(
-            realHomeScore,
-            realAwayScore
-        );
-
-        const predictedOutcome = getOutcome(
-            prediction.homeScore,
-            prediction.awayScore
-        );
-
-        const exactScore =
-            prediction.homeScore === realHomeScore &&
-            prediction.awayScore === realAwayScore;
-
-        if (exactScore) {
-            return {
-                status: "exact",
-                label: "Score exact",
-                points:
-                    getOutcomePoints(match, realOutcome) +
-                    EXACT_SCORE_BONUS
-            };
-        }
-
-        if (predictedOutcome === realOutcome) {
-            return {
-                status: "correct",
-                label: "Bon résultat",
-                points: getOutcomePoints(match, realOutcome)
-            };
-        }
-
-        return {
-            status: "wrong",
-            label: "Mauvais résultat",
-            points: 0
-        };
+    .pronostic-team-name {
+        flex-direction: column;
+        gap: 6px;
     }
 
-    function renderMatches() {
-        if (!matchesContainer) {
-            return;
-        }
-
-        if (matchCount) {
-            matchCount.textContent =
-                `${matches.length} matchs`;
-        }
-
-        matchesContainer.innerHTML = matches
-            .map((match) => {
-                const prediction = predictions[match.id];
-
-                return `
-                    <article class="match-card">
-
-                        <div class="match-topline">
-
-                            <div class="match-context">
-                                <span class="champions-star">
-                                    ★
-                                </span>
-
-                                <span>
-                                    ${escapeHtml(match.stage)}
-                                </span>
-                            </div>
-
-                            <time class="match-time">
-                                ${escapeHtml(match.date)}
-                                ·
-                                ${escapeHtml(match.time)}
-                            </time>
-
-                        </div>
-
-                        ${
-                            prediction
-                                ? renderSavedPrediction(
-                                    match,
-                                    prediction
-                                )
-                                : renderPredictionForm(match)
-                        }
-
-                    </article>
-                `;
-            })
-            .join("");
-
-        bindPredictionInputs();
-        bindSaveButtons();
-        bindEditButtons();
+    .pronostic-team-name strong {
+        max-width: 120px;
+        font-size: .66rem;
+        white-space: normal;
     }
 
-    function renderPredictionForm(match) {
-        const locked = isMatchLocked(match);
-        return `
-            <div class="match-content">
-
-                <div class="match-team match-team-home">
-                    ${renderTeamLogo(
-                        match.homeLogo,
-                        match.homeShort,
-                        match.homeTeam
-                    )}
-
-                    <strong class="team-name">
-                        ${escapeHtml(match.homeTeam)}
-                    </strong>
-
-                    <span class="team-odds">
-                        ${match.odds.home} pts
-                    </span>
-
-                </div>
-
-                <div class="prediction-center">
-
-                    <span class="prediction-label">
-                        Ton score
-                    </span>
-
-                    <div class="score-selector">
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            autocomplete="off"
-                            class="score-input"
-                            ${locked ? "disabled" : ""}
-                            data-home-input="${escapeHtml(match.id)}"
-                            aria-label="Score de ${escapeHtml(match.homeTeam)}"
-                        >
-
-                        <span class="score-separator">
-                            -
-                        </span>
-
-                        <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            autocomplete="off"
-                            class="score-input"
-                            ${locked ? "disabled" : ""}
-                            data-away-input="${escapeHtml(match.id)}"
-                            aria-label="Score de ${escapeHtml(match.awayTeam)}"
-                        >
-
-                    </div>
-
-                    <span
-                        class="prediction-points"
-                        id="prediction-points-${escapeHtml(match.id)}"
-                    >
-                        Entre ton pronostic
-                    </span>
-
-                </div>
-
-                <div class="match-team match-team-away">
-                    ${renderTeamLogo(
-                        match.awayLogo,
-                        match.awayShort,
-                        match.awayTeam
-                    )}
-
-                    <strong class="team-name">
-                        ${escapeHtml(match.awayTeam)}
-                    </strong>
-
-                    <span class="team-odds">
-                        ${match.odds.away} pts
-                    </span>
-
-                </div>
-
-            </div>
-
-            <div class="match-footer">
-
-                <div class="draw-information">
-                    <span>Match nul</span>
-                    <strong>${match.odds.draw} pts</strong>
-                </div>
-
-                <div class="bonus-information">
-                    <span>Score exact</span>
-                    <strong>+${EXACT_SCORE_BONUS} pts</strong>
-                </div>
-
-                <button
-    type="button"
-    class="save-prediction-button"
-    ${locked ? "disabled" : ""}
-    data-save-match="${escapeHtml(match.id)}"
->
-    ${locked ? "Pronostics fermés" : "Valider"}
-</button>
-
-            </div>
-        `;
+    .team-badge {
+        width: 36px;
+        height: 36px;
+        font-size: .52rem;
     }
 
-    function renderSavedPrediction(match, prediction) {
-        const outcomeLabel = getOutcomeLabel(
-            match,
-            prediction.outcome
-        );
-
-        const exactScorePoints =
-            prediction.basePoints + EXACT_SCORE_BONUS;
-
-        const result = calculatePredictionResult(
-            match,
-            prediction
-        );
-
-        return `
-            <div class="match-content saved-match-content">
-
-                <div class="match-team match-team-home">
-                    ${renderTeamLogo(
-                        match.homeLogo,
-                        match.homeShort,
-                        match.homeTeam
-                    )}
-
-                    <strong class="team-name">
-                        ${escapeHtml(match.homeTeam)}
-                    </strong>
-
-                    <span class="team-odds">
-                        ${match.odds.home} pts
-                    </span>
-
-                </div>
-
-                <div class="prediction-center">
-
-                    <span class="prediction-label">
-                        Mon pronostic
-                    </span>
-
-                    <div class="saved-score">
-                        <span>
-                            ${prediction.homeScore}
-                        </span>
-
-                        <strong>-</strong>
-
-                        <span>
-                            ${prediction.awayScore}
-                        </span>
-                    </div>
-
-                    <span class="prediction-points">
-                        ${escapeHtml(outcomeLabel)}
-                    </span>
-
-                </div>
-
-                <div class="match-team match-team-away">
-                    ${renderTeamLogo(
-                        match.awayLogo,
-                        match.awayShort,
-                        match.awayTeam
-                    )}
-
-                    <strong class="team-name">
-                        ${escapeHtml(match.awayTeam)}
-                    </strong>
-
-                    <span class="team-odds">
-                        ${match.odds.away} pts
-                    </span>
-
-                </div>
-
-            </div>
-
-            <div class="saved-prediction-footer">
-
-                <div class="saved-points-information">
-
-                    <span>
-                        Bon résultat
-                    </span>
-
-                    <strong>
-                        ${prediction.basePoints} pts
-                    </strong>
-
-                </div>
-
-                <div class="saved-points-information">
-
-                    <span>
-                        Score exact
-                    </span>
-
-                    <strong>
-                        ${exactScorePoints} pts
-                    </strong>
-
-                </div>
-
-                ${renderResultStatus(result)}
-
-                ${
-                    match.finalScore
-                        ? ""
-                        : `
-                            <button
-                                type="button"
-                                class="edit-prediction-button"
-                                data-edit-match="${escapeHtml(match.id)}"
-                            >
-                                Modifier
-                            </button>
-                        `
-                }
-
-            </div>
-        `;
+    .pronostic-team-points {
+        margin-top: 6px;
+        padding: 3px 6px;
+        font-size: .49rem;
     }
 
-    function renderResultStatus(result) {
-        if (result.points === null) {
-            return `
-                <div class="result-status result-pending">
-                    Résultat en attente
-                </div>
-            `;
-        }
-
-        return `
-            <div class="result-status result-${result.status}">
-                <span>
-                    ${escapeHtml(result.label)}
-                </span>
-
-                <strong>
-                    ${result.points} pts
-                </strong>
-            </div>
-        `;
+    .teams-versus {
+        margin-top: 23px;
+        font-size: .47rem;
     }
 
-    function bindPredictionInputs() {
-        matches.forEach((match) => {
-            const homeInput = document.querySelector(
-                `[data-home-input="${match.id}"]`
-            );
-
-            const awayInput = document.querySelector(
-                `[data-away-input="${match.id}"]`
-            );
-
-            if (!homeInput || !awayInput) {
-                return;
-            }
-
-            const updatePointsPreview = () => {
-                const preview = document.getElementById(
-                    `prediction-points-${match.id}`
-                );
-
-                if (!preview) {
-                    return;
-                }
-
-                const homeValue = homeInput.value.trim();
-                const awayValue = awayInput.value.trim();
-
-                if (
-                    homeValue === "" ||
-                    awayValue === ""
-                ) {
-                    preview.textContent =
-                        "Entre ton pronostic";
-
-                    return;
-                }
-
-                const homeScore = Number(homeValue);
-                const awayScore = Number(awayValue);
-
-                if (
-                    !isValidScore(homeScore) ||
-                    !isValidScore(awayScore)
-                ) {
-                    preview.textContent =
-                        "Score entre 0 et 20";
-
-                    return;
-                }
-
-                const outcome = getOutcome(
-                    homeScore,
-                    awayScore
-                );
-
-                const basePoints = getOutcomePoints(
-                    match,
-                    outcome
-                );
-
-                preview.innerHTML = `
-                    ${basePoints} pts
-                    <span>·</span>
-                    Exact ${basePoints + EXACT_SCORE_BONUS} pts
-                `;
-            };
-
-            homeInput.addEventListener(
-                "input",
-                updatePointsPreview
-            );
-
-            awayInput.addEventListener(
-                "input",
-                updatePointsPreview
-            );
-        });
+    .prediction-box {
+        width: min(100%, 240px);
+        margin-top: 17px;
+        padding: 13px;
     }
 
-    function bindSaveButtons() {
-        const buttons = document.querySelectorAll(
-            "[data-save-match]"
-        );
-
-        buttons.forEach((button) => {
-            button.addEventListener("click", () => {
-                const matchId = button.dataset.saveMatch;
-
-                savePrediction(matchId);
-            });
-        });
+    .prediction-box .score-input {
+        width: 48px;
+        height: 41px;
     }
 
-    function savePrediction(matchId) {
-        const match = getMatchById(matchId);
-
-        if (!match) {
-            alert("Match introuvable.");
-            return;
-        }
-
-        const homeInput = document.querySelector(
-            `[data-home-input="${matchId}"]`
-        );
-
-        const awayInput = document.querySelector(
-            `[data-away-input="${matchId}"]`
-        );
-
-        if (!homeInput || !awayInput) {
-            alert("Les cases de score sont introuvables.");
-            return;
-        }
-
-        const homeValue = homeInput.value.trim();
-        const awayValue = awayInput.value.trim();
-
-        if (homeValue === "" || awayValue === "") {
-            alert("Entre le score des deux équipes.");
-            return;
-        }
-
-        const homeScore = Number(homeValue);
-        const awayScore = Number(awayValue);
-
-        if (
-            !isValidScore(homeScore) ||
-            !isValidScore(awayScore)
-        ) {
-            alert(
-                "Le score doit être un nombre entier entre 0 et 20."
-            );
-
-            return;
-        }
-
-        const outcome = getOutcome(
-            homeScore,
-            awayScore
-        );
-
-        predictions[matchId] = {
-            homeScore,
-            awayScore,
-            outcome,
-            basePoints: getOutcomePoints(match, outcome),
-            savedAt: new Date().toISOString()
-        };
-
-        savePredictions();
-        renderMatches();
-        renderMyPredictions();
-
-        const predictionsSection = document.getElementById(
-            "mes-pronos"
-        );
-
-        predictionsSection?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+    .match-rewards {
+        gap: 14px;
     }
 
-    function bindEditButtons() {
-        const buttons = document.querySelectorAll(
-            "[data-edit-match]"
-        );
-
-        buttons.forEach((button) => {
-            button.addEventListener("click", () => {
-                const matchId = button.dataset.editMatch;
-                const prediction = predictions[matchId];
-
-                if (!prediction) {
-                    return;
-                }
-
-                delete predictions[matchId];
-
-                savePredictions();
-                renderMatches();
-                renderMyPredictions();
-
-                requestAnimationFrame(() => {
-                    const homeInput = document.querySelector(
-                        `[data-home-input="${matchId}"]`
-                    );
-
-                    const awayInput = document.querySelector(
-                        `[data-away-input="${matchId}"]`
-                    );
-
-                    if (homeInput) {
-                        homeInput.value =
-                            prediction.homeScore;
-                    }
-
-                    if (awayInput) {
-                        awayInput.value =
-                            prediction.awayScore;
-                    }
-
-                    homeInput?.dispatchEvent(
-                        new Event("input")
-                    );
-
-                    homeInput?.focus();
-                });
-            });
-        });
+    .reward-information {
+        flex-direction: column;
+        gap: 2px;
+        text-align: center;
+        font-size: .52rem;
     }
 
-    function renderMyPredictions() {
-        if (!predictionsContainer) {
-            return;
-        }
-
-        const savedEntries = matches
-            .filter((match) => predictions[match.id])
-            .map((match) => ({
-                match,
-                prediction: predictions[match.id]
-            }));
-
-        if (savedEntries.length === 0) {
-            predictionsContainer.innerHTML = `
-                <div class="empty-card">
-                    Aucun pronostic enregistré.
-                </div>
-            `;
-
-            return;
-        }
-
-        predictionsContainer.innerHTML = savedEntries
-            .map(({ match, prediction }) => {
-                const result = calculatePredictionResult(
-                    match,
-                    prediction
-                );
-
-                const pointsText =
-                    result.points === null
-                        ? `${prediction.basePoints} pts possibles`
-                        : `${result.points} pts gagnés`;
-
-                return `
-                    <article class="prediction-summary">
-
-                        <div class="prediction-summary-date">
-                            <span>
-                                ${escapeHtml(match.date)}
-                            </span>
-
-                            <small>
-                                ${escapeHtml(match.time)}
-                            </small>
-                        </div>
-
-                        <div class="prediction-summary-match">
-
-                            <div class="summary-team">
-                                <span class="summary-team-code">
-                                    ${escapeHtml(match.homeShort)}
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(match.homeTeam)}
-                                </strong>
-                            </div>
-
-                            <div class="summary-score">
-                                ${prediction.homeScore}
-                                -
-                                ${prediction.awayScore}
-                            </div>
-
-                            <div class="summary-team summary-team-away">
-                                <span class="summary-team-code">
-                                    ${escapeHtml(match.awayShort)}
-                                </span>
-
-                                <strong>
-                                    ${escapeHtml(match.awayTeam)}
-                                </strong>
-                            </div>
-
-                        </div>
-
-                        <div class="prediction-summary-points">
-
-                            <strong>
-                                ${pointsText}
-                            </strong>
-
-                            <span>
-                                Exact :
-                                ${
-                                    prediction.basePoints +
-                                    EXACT_SCORE_BONUS
-                                }
-                                pts
-                            </span>
-
-                        </div>
-
-                    </article>
-                `;
-            })
-            .join("");
+    .save-prediction-button {
+        width: 100%;
     }
 
-    function bindNavigationTabs() {
-        const tabs = document.querySelectorAll(".main-tab");
-
-        tabs.forEach((tab) => {
-            tab.addEventListener("click", () => {
-                tabs.forEach((item) => {
-                    item.classList.remove("active");
-                });
-
-                tab.classList.add("active");
-            });
-        });
+    .match-content {
+        grid-template-columns: minmax(0,1fr) 102px minmax(0,1fr);
+        gap: 6px;
     }
 
-    function isMatchLocked(match) {
-        if (!match.kickoff) return false;
-
-        const kickoffDate = new Date(match.kickoff);
-        if (Number.isNaN(kickoffDate.getTime())) return false;
-
-        return new Date() >= kickoffDate;
+    .match-team {
+        flex-direction: column;
+        gap: 5px;
     }
 
-    window.addEventListener("storage", (event) => {
-        if (event.key !== ADMIN_MATCHES_KEY) return;
+    .match-team-home,
+    .match-team-away {
+        justify-content: center;
+        text-align: center;
+    }
 
-        matches = loadAdminMatches();
-        renderMatches();
-        renderMyPredictions();
-    });
+    .match-team-home .team-badge,
+    .match-team-home .team-name,
+    .match-team-home .team-odds {
+        order: initial;
+    }
 
-    renderMatches();
-    renderMyPredictions();
-    bindNavigationTabs();
+    .team-name {
+        max-width: 100%;
+        font-size: .64rem;
+        white-space: normal;
+    }
 
-});
+    .team-odds {
+        padding: 3px 5px;
+        font-size: .50rem;
+    }
+
+    .saved-prediction-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .prediction-summary {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .prediction-summary-date {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .prediction-summary-date small {
+        margin-top: 0;
+    }
+
+    .prediction-summary-match {
+        grid-template-columns: minmax(0,1fr) 48px minmax(0,1fr);
+        gap: 7px;
+    }
+
+    .summary-team {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .summary-team-away {
+        justify-content: center;
+    }
+
+    .summary-team strong {
+        font-size: .59rem;
+        white-space: normal;
+    }
+
+    .prediction-summary-points {
+        grid-column: auto;
+    }
+
+    .ranking-entry {
+        grid-template-columns: 24px 25px minmax(0,1fr) auto;
+        padding: 12px 10px;
+    }
+
+    .ranking-points {
+        font-size: .61rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .player-copy {
+        display: none;
+    }
+
+    .header-player {
+        padding: 6px;
+    }
+
+    .hero h1 {
+        font-size: 1.95rem;
+    }
+
+    .match-content {
+        grid-template-columns: minmax(0,1fr) 92px minmax(0,1fr);
+    }
+
+    .score-input {
+        width: 35px;
+        height: 34px;
+    }
+
+    .saved-score span {
+        width: 35px;
+        height: 34px;
+    }
+
+    .saved-points-information {
+        font-size: .51rem;
+    }
+}
+
+/* =========================
+   AUTHENTIFICATION FIREBASE
+========================= */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-auth-button {
+    padding: 9px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    color: white;
+    background: rgba(31, 111, 255, 0.16);
+    cursor: pointer;
+    font-size: 0.68rem;
+    font-weight: 900;
+}
+
+.header-auth-button:hover {
+    background: rgba(31, 111, 255, 0.28);
+}
+
+.auth-hidden,
+.auth-form-hidden {
+    display: none !important;
+}
+
+.modal-is-open {
+    overflow: hidden;
+}
+
+.auth-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(1, 3, 13, 0.78);
+    backdrop-filter: blur(12px);
+}
+
+.auth-modal.auth-modal-open {
+    display: flex;
+}
+
+.auth-dialog {
+    position: relative;
+    width: min(440px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 28px;
+    border: 1px solid var(--border-strong);
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(15, 29, 68, 0.99), rgba(6, 14, 36, 0.99));
+    box-shadow: var(--shadow);
+}
+
+.auth-dialog h2 {
+    margin-top: 6px;
+    font-size: 1.7rem;
+}
+
+.auth-close-button {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+.auth-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 22px 0 18px;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(3, 9, 27, 0.58);
+}
+
+.auth-tab {
+    padding: 10px;
+    border-radius: 8px;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.auth-tab.active {
+    color: white;
+    background: linear-gradient(105deg, var(--blue), var(--purple));
+}
+
+.auth-form {
+    display: grid;
+    gap: 14px;
+}
+
+.auth-form label {
+    display: grid;
+    gap: 7px;
+    color: var(--blue-pale);
+    font-size: 0.64rem;
+    font-weight: 800;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    outline: none;
+    color: white;
+    background: rgba(3, 9, 27, 0.8);
+}
+
+.auth-form input:focus {
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(69, 137, 255, 0.15);
+}
+
+.auth-submit-button {
+    margin-top: 4px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: linear-gradient(105deg, var(--blue), var(--purple));
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.auth-message {
+    min-height: 18px;
+    margin-bottom: 12px;
+    font-size: 0.65rem;
+    line-height: 1.45;
+}
+
+.auth-message-error { color: #ffd0d7; }
+.auth-message-success { color: #baffdf; }
+
+@media (max-width: 650px) {
+    .header-actions { gap: 6px; }
+    .header-auth-button { padding: 8px 10px; font-size: 0.6rem; }
+    .header-player { padding-right: 8px; }
+    .auth-dialog { padding: 24px 18px; }
+}
