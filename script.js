@@ -14,7 +14,8 @@ let firebaseAuth = null;
 let firebaseDb = null;
 
 let arreterEcoutePronostics = null;
-    let matchsCharges = false;
+let arreterEcouteClassement = null;
+let matchsCharges = false;
 let pronosticsCharges = false;
 let dernierTotalEnregistre = null;
 
@@ -63,6 +64,13 @@ dernierTotalEnregistre = null;
                 arreterEcoutePronostics();
                 arreterEcoutePronostics = null;
             }
+            
+            if (arreterEcouteClassement) {
+    arreterEcouteClassement();
+    arreterEcouteClassement = null;
+}
+
+afficherClassementDeconnecte();
 
             renderMatches();
             renderMyPredictions();
@@ -74,6 +82,7 @@ dernierTotalEnregistre = null;
         }
 
         ecouterPronosticsFirebase(utilisateur.uid);
+        ecouterClassementFirebase(utilisateur.uid);
     }
 );
 
@@ -347,6 +356,338 @@ recalculerTotalJoueur();
                 );
             }
         );
+}
+    function ecouterClassementFirebase(userId) {
+    if (
+        !firebaseFirestoreModule ||
+        !firebaseDb ||
+        !userId
+    ) {
+        return;
+    }
+
+    if (arreterEcouteClassement) {
+        arreterEcouteClassement();
+    }
+
+    const collectionUtilisateurs =
+        firebaseFirestoreModule.collection(
+            firebaseDb,
+            "users"
+        );
+
+    arreterEcouteClassement =
+        firebaseFirestoreModule.onSnapshot(
+            collectionUtilisateurs,
+
+            function (snapshot) {
+                const joueurs = snapshot.docs
+                    .map(function (document) {
+                        const donnees = document.data();
+
+                        const email =
+                            String(donnees.email || "").trim();
+
+                        const nom =
+                            String(
+                                donnees.displayName ||
+                                donnees.pseudo ||
+                                email.split("@")[0] ||
+                                "Joueur"
+                            ).trim();
+
+                        return {
+                            id: document.id,
+                            nom,
+                            points:
+                                Number(
+                                    donnees.points ??
+                                    donnees.totalPoints
+                                ) || 0,
+                            bonsResultats:
+                                Number(donnees.bonsResultats) || 0,
+                            scoresExacts:
+                                Number(donnees.scoresExacts) || 0,
+                            matchsJoues:
+                                Number(donnees.matchsJoues) || 0
+                        };
+                    })
+                    .sort(function (joueurA, joueurB) {
+                        if (joueurB.points !== joueurA.points) {
+                            return joueurB.points - joueurA.points;
+                        }
+
+                        if (
+                            joueurB.bonsResultats !==
+                            joueurA.bonsResultats
+                        ) {
+                            return (
+                                joueurB.bonsResultats -
+                                joueurA.bonsResultats
+                            );
+                        }
+
+                        if (
+                            joueurB.scoresExacts !==
+                            joueurA.scoresExacts
+                        ) {
+                            return (
+                                joueurB.scoresExacts -
+                                joueurA.scoresExacts
+                            );
+                        }
+
+                        return joueurA.nom.localeCompare(
+                            joueurB.nom,
+                            "fr",
+                            {
+                                sensitivity: "base"
+                            }
+                        );
+                    });
+
+                afficherClassement(
+                    joueurs,
+                    userId
+                );
+            },
+
+            function (erreur) {
+                console.error(
+                    "Impossible de charger le classement :",
+                    erreur
+                );
+
+                const classement =
+                    document.getElementById(
+                        "ranking-container"
+                    );
+
+                if (classement) {
+                    classement.innerHTML = `
+                        <div class="empty-card">
+                            Impossible de charger le classement.
+                        </div>
+                    `;
+                }
+            }
+        );
+}
+
+
+function afficherClassement(joueurs, userId) {
+    const classement =
+        document.getElementById(
+            "ranking-container"
+        );
+
+    if (!classement) {
+        return;
+    }
+
+    if (joueurs.length === 0) {
+        classement.innerHTML = `
+            <div class="empty-card">
+                Aucun joueur dans le classement.
+            </div>
+        `;
+
+        mettreAJourPerformanceJoueur(
+            null,
+            null
+        );
+
+        return;
+    }
+
+    classement.innerHTML = joueurs
+        .map(function (joueur, index) {
+            const position = index + 1;
+
+            const estJoueurActuel =
+                joueur.id === userId;
+
+            const classes = [
+                "ranking-entry"
+            ];
+
+            if (position === 1) {
+                classes.push(
+                    "ranking-entry-gold"
+                );
+            }
+
+            if (estJoueurActuel) {
+                classes.push(
+                    "ranking-entry-current"
+                );
+            }
+
+            const textePronostics =
+                formaterBonsPronostics(
+                    joueur.bonsResultats
+                );
+
+            return `
+                <article class="${classes.join(" ")}">
+
+                    <span class="ranking-position">
+                        ${position}
+                    </span>
+
+                    <span class="ranking-icon">
+                        ★
+                    </span>
+
+                    <div class="ranking-person">
+                        <strong>
+                            ${escapeHtml(joueur.nom)}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(textePronostics)}
+                        </span>
+                    </div>
+
+                    <strong class="ranking-points">
+                        ${formaterPoints(joueur.points)} pts
+                    </strong>
+
+                </article>
+            `;
+        })
+        .join("");
+
+    const indexJoueurActuel =
+        joueurs.findIndex(function (joueur) {
+            return joueur.id === userId;
+        });
+
+    const joueurActuel =
+        indexJoueurActuel >= 0
+            ? joueurs[indexJoueurActuel]
+            : null;
+
+    const positionJoueurActuel =
+        indexJoueurActuel >= 0
+            ? indexJoueurActuel + 1
+            : null;
+
+    mettreAJourPerformanceJoueur(
+        joueurActuel,
+        positionJoueurActuel
+    );
+}
+
+
+function mettreAJourPerformanceJoueur(
+    joueur,
+    position
+) {
+    const rang =
+        document.getElementById(
+            "current-player-rank"
+        );
+
+    const points =
+        document.getElementById(
+            "current-player-points"
+        );
+
+    const bonsPronostics =
+        document.getElementById(
+            "current-player-correct-predictions"
+        );
+
+    const pointsProfil =
+        document.getElementById(
+            "profile-points"
+        );
+
+    if (!joueur) {
+        if (rang) {
+            rang.textContent = "#-";
+        }
+
+        if (points) {
+            points.textContent = "0 point";
+        }
+
+        if (bonsPronostics) {
+            bonsPronostics.textContent =
+                "0 bon pronostic";
+        }
+
+        if (pointsProfil) {
+            pointsProfil.textContent = "0";
+        }
+
+        return;
+    }
+
+    if (rang) {
+        rang.textContent =
+            position ? `#${position}` : "#-";
+    }
+
+    if (points) {
+        points.textContent =
+            `${formaterPoints(joueur.points)} ${
+                joueur.points > 1
+                    ? "points"
+                    : "point"
+            }`;
+    }
+
+    if (bonsPronostics) {
+        bonsPronostics.textContent =
+            formaterBonsPronostics(
+                joueur.bonsResultats
+            );
+    }
+
+    if (pointsProfil) {
+        pointsProfil.textContent =
+            formaterPoints(joueur.points);
+    }
+}
+
+
+function afficherClassementDeconnecte() {
+    const classement =
+        document.getElementById(
+            "ranking-container"
+        );
+
+    if (classement) {
+        classement.innerHTML = `
+            <div class="empty-card">
+                Connecte-toi pour voir le classement.
+            </div>
+        `;
+    }
+
+    mettreAJourPerformanceJoueur(
+        null,
+        null
+    );
+}
+
+
+function formaterPoints(points) {
+    return Number(points || 0)
+        .toLocaleString("fr-FR");
+}
+
+
+function formaterBonsPronostics(nombre) {
+    const total = Number(nombre) || 0;
+
+    return `${total} bon${
+        total > 1 ? "s" : ""
+    } pronostic${
+        total > 1 ? "s" : ""
+    }`;
 }
     async function recalculerTotalJoueur() {
 
@@ -1277,6 +1618,10 @@ window.addEventListener("beforeunload", function () {
 
     if (arreterEcoutePronostics) {
         arreterEcoutePronostics();
+    }
+
+    if (arreterEcouteClassement) {
+    arreterEcouteClassement();
     }
 });
 
