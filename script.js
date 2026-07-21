@@ -418,14 +418,19 @@ function ecouterPronosticsFirebase(userId) {
             ),
 
             {
-                displayName: nomJoueur,
-                totalPoints,
-                matchsJoues,
-                scoresExacts,
-                bonsResultats,
-                updatedAt:
-                    firebaseFirestoreModule.serverTimestamp()
-            },
+    displayName: nomJoueur,
+
+    // Les deux champs restent synchronisés
+    points: totalPoints,
+    totalPoints: totalPoints,
+
+    matchsJoues,
+    scoresExacts,
+    bonsResultats,
+
+    updatedAt:
+        firebaseFirestoreModule.serverTimestamp()
+}
 
             {
                 merge: true
