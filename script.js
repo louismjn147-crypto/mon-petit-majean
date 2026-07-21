@@ -4,80 +4,167 @@ document.addEventListener("DOMContentLoaded", () => {
     const EXACT_SCORE_BONUS = 150;
     const STORAGE_KEY = "monPetitMajeanPredictionsV20";
 
-    const matches = [
-        {
-            id: "psg-real",
-            competition: "Ligue des champions",
-            stage: "Phase de ligue",
-            date: "Mardi 17 septembre",
-            Time: "21h00",
-            kickoff: "2026-09-17T21:20:00",
-            homeTeam: "Paris SG",
-            homeLogo: "logos/psg.png",
-            awayTeam: "Chelsea FC",
-            awayLogo: "logos/chelsea.png",
-            odds: {
-                home: 175,
-                draw: 320,
-                away: 205
-            },
-            finalScore: null
-        },
-        {
-            id: "city-inter",
-            competition: "Ligue des champions",
-            stage: "Phase de ligue",
-            date: "Mardi 17 septembre",
-            time: "21h00",
-            kickoff: "2026-09-17T21:21:00",
-            homeTeam: "Manchester City",
-            homeLogo: "logos/manchester.png",
-            awayTeam: "Inter Milan",
-            awayLogo: "logos/inter.png",
-            odds: {
-                home: 145,
-                draw: 360,
-                away: 440
-            },
-            finalScore: null
-        },
-         {
-            id: "RCLens-Losc",
-            competition: "Ligue des champions",
-            stage: "Phase de ligue",
-            date: "Mardi 17 septembre",
-            time: "21h00",
-            kickoff: "2025-09-17T21:00:00",
-            homeTeam: "RC Lens",
-            homeLogo: "logos/rclens.png",
-            awayTeam: "Real Madrid",
-            awayLogo: "logos/madrid.png",
-            odds: {
-                home: 175,
-                draw: 320,
-                away: 205
-            },
-            finalScore: null
-        },
-        {
-            id: "bayern-arsenal",
-            competition: "Ligue des champions",
-            stage: "Phase de ligue",
-            date: "Mercredi 18 septembre",
-            time: "21h00",
-            kickoff: "2025-09-17T21:00:00",
-            homeTeam: "Bayern Munich",
-            homeLogo: "logos/munich.png",
-            awayTeam: "Arsenal",
-            awayLogo: "logos/arsenal.png",
-            odds: {
-                home: 190,
-                draw: 335,
-                away: 265
-            },
-            finalScore: null
+    const ADMIN_MATCHES_KEY = "adminMatches";
+
+    let matches = loadAdminMatches();
+
+    function loadAdminMatches() {
+        try {
+            const savedData = localStorage.getItem(ADMIN_MATCHES_KEY);
+            if (!savedData) return [];
+
+            const adminMatches = JSON.parse(savedData);
+            if (!Array.isArray(adminMatches)) return [];
+
+            return adminMatches.map((match, index) =>
+                convertAdminMatch(match, index)
+            );
+        } catch (error) {
+            console.error("Erreur lors du chargement des matchs admin :", error);
+            return [];
         }
-    ];
+    }
+
+    function convertAdminMatch(match, index) {
+        const homeTeam = String(match.homeTeam || "Équipe domicile").trim();
+        const awayTeam = String(match.awayTeam || "Équipe extérieure").trim();
+        const rawDate = String(match.date || "").trim();
+        const rawTime = String(match.time || "").trim();
+
+        return {
+            id: match.id || createMatchId(homeTeam, awayTeam, rawDate, rawTime, index),
+            competition: "Ligue des champions",
+            stage: match.stage || "Phase de ligue",
+            date: formatMatchDate(rawDate),
+            time: formatMatchTime(rawTime),
+            kickoff: rawDate && rawTime ? `${rawDate}T${rawTime}:00` : null,
+            homeTeam,
+            homeShort: createTeamShortName(homeTeam),
+            homeLogo: getTeamLogo(homeTeam),
+            awayTeam,
+            awayShort: createTeamShortName(awayTeam),
+            awayLogo: getTeamLogo(awayTeam),
+            odds: {
+                home: Number(match.homeOdds) || 0,
+                draw: Number(match.drawOdds) || 0,
+                away: Number(match.awayOdds) || 0
+            },
+            finalScore:
+                match.homeScore !== undefined &&
+                match.homeScore !== null &&
+                match.homeScore !== "" &&
+                match.awayScore !== undefined &&
+                match.awayScore !== null &&
+                match.awayScore !== ""
+                    ? {
+                        home: Number(match.homeScore),
+                        away: Number(match.awayScore)
+                    }
+                    : null
+        };
+    }
+
+    function createMatchId(homeTeam, awayTeam, date, time, index) {
+        return `${homeTeam}-${awayTeam}-${date}-${time}-${index}`
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+    }
+
+    function createTeamShortName(teamName) {
+        const ignoredWords = ["fc", "cf", "ac", "as", "rc", "sc", "club"];
+        const words = teamName.split(/\s+/).filter(Boolean);
+        const usefulWords = words.filter(
+            (word) => !ignoredWords.includes(word.toLowerCase())
+        );
+        const sourceWords = usefulWords.length > 0 ? usefulWords : words;
+
+        if (sourceWords.length === 1) {
+            return sourceWords[0].slice(0, 3).toUpperCase();
+        }
+
+        return sourceWords
+            .map((word) => word.charAt(0))
+            .join("")
+            .slice(0, 3)
+            .toUpperCase();
+    }
+
+    function normalizeTeamName(teamName) {
+        return teamName
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]/g, "");
+    }
+
+    function getTeamLogo(teamName) {
+        const logos = {
+            parissg: "logos/psg.png",
+            psg: "logos/psg.png",
+            realmadrid: "logos/madrid.png",
+            manchestercity: "logos/manchester.jpg",
+            mancity: "logos/manchester.jpg",
+            intermilano: "logos/inter.png",
+            inter: "logos/inter.png",
+            rclens: "logos/rclens.jpg",
+            lens: "logos/rclens.jpg",
+            bayernmunich: "logos/munich.jpg",
+            bayern: "logos/munich.jpg",
+            arsenal: "logos/arsenal.png"
+        };
+
+        return logos[normalizeTeamName(teamName)] || "";
+    }
+
+    function formatMatchDate(dateText) {
+        if (!dateText) return "Date à définir";
+
+        const date = new Date(`${dateText}T12:00:00`);
+        if (Number.isNaN(date.getTime())) return dateText;
+
+        const formattedDate = date.toLocaleDateString("fr-FR", {
+            weekday: "long",
+            day: "numeric",
+            month: "long"
+        });
+
+        return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+    }
+
+    function formatMatchTime(timeText) {
+        return timeText ? timeText.replace(":", "h") : "Heure à définir";
+    }
+
+    function renderTeamLogo(logoPath, shortName, teamName) {
+        const safeShortName = escapeHtml(shortName || "?");
+
+        if (!logoPath) {
+            return `
+                <span
+                    class="team-logo-fallback"
+                    aria-label="${escapeHtml(teamName)}"
+                    style="width:42px;height:42px;min-width:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;background:rgba(255,255,255,0.12);"
+                >${safeShortName}</span>
+            `;
+        }
+
+        return `
+            <img
+                src="${escapeHtml(logoPath)}"
+                alt="${escapeHtml(teamName)}"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                style="width:42px;height:42px;max-width:42px;max-height:42px;object-fit:contain;display:block;"
+            >
+            <span
+                class="team-logo-fallback"
+                aria-hidden="true"
+                style="width:42px;height:42px;min-width:42px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:800;background:rgba(255,255,255,0.12);"
+            >${safeShortName}</span>
+        `;
+    }
 
     const matchesContainer = document.getElementById(
         "matches-container"
@@ -90,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const matchCount = document.getElementById("match-count");
 
     let predictions = loadPredictions();
-    let connectedUser = null;
 
     function loadPredictions() {
         try {
@@ -127,12 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 STORAGE_KEY,
                 JSON.stringify(predictions)
             );
-
-            if (connectedUser && window.mpmFirebase) {
-                window.mpmFirebase.savePredictions(predictions).catch((error) => {
-                    console.error("Erreur Firestore :", error);
-                });
-            }
         } catch (error) {
             console.error(
                 "Erreur lors de l'enregistrement :",
@@ -307,19 +387,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="match-content">
 
                 <div class="match-team match-team-home">
-
-                    <img
-    src="${escapeHtml(match.homeLogo)}"
-    alt="${escapeHtml(match.homeTeam)}"
-    style="
-        width:42px;
-        height:42px;
-        max-width:42px;
-        max-height:42px;
-        object-fit:contain;
-        display:block;
-    "
->
+                    ${renderTeamLogo(
+                        match.homeLogo,
+                        match.homeShort,
+                        match.homeTeam
+                    )}
 
                     <strong class="team-name">
                         ${escapeHtml(match.homeTeam)}
@@ -379,19 +451,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
 
                 <div class="match-team match-team-away">
-
-                    <img
-    src="${escapeHtml(match.awayLogo)}"
-    alt="${escapeHtml(match.awayTeam)}"
-    style="
-        width:42px;
-        height:42px;
-        max-width:42px;
-        max-height:42px;
-        object-fit:contain;
-        display:block;
-    "
->
+                    ${renderTeamLogo(
+                        match.awayLogo,
+                        match.awayShort,
+                        match.awayTeam
+                    )}
 
                     <strong class="team-name">
                         ${escapeHtml(match.awayTeam)}
@@ -448,19 +512,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="match-content saved-match-content">
 
                 <div class="match-team match-team-home">
-
-                    <img
-    src="${escapeHtml(match.homeLogo)}"
-    alt="${escapeHtml(match.homeTeam)}"
-    style="
-        width:42px;
-        height:42px;
-        max-width:42px;
-        max-height:42px;
-        object-fit:contain;
-        display:block;
-    "
->
+                    ${renderTeamLogo(
+                        match.homeLogo,
+                        match.homeShort,
+                        match.homeTeam
+                    )}
 
                     <strong class="team-name">
                         ${escapeHtml(match.homeTeam)}
@@ -497,19 +553,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
 
                 <div class="match-team match-team-away">
-
-                   <img
-    src="${escapeHtml(match.awayLogo)}"
-    alt="${escapeHtml(match.awayTeam)}"
-    style="
-        width:42px;
-        height:42px;
-        max-width:42px;
-        max-height:42px;
-        object-fit:contain;
-        display:block;
-    "
->
+                    ${renderTeamLogo(
+                        match.awayLogo,
+                        match.awayShort,
+                        match.awayTeam
+                    )}
 
                     <strong class="team-name">
                         ${escapeHtml(match.awayTeam)}
@@ -684,11 +732,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function savePrediction(matchId) {
-        if (!connectedUser) {
-            window.mpmFirebase?.openAuthModal();
-            return;
-        }
-
         const match = getMatchById(matchId);
 
         if (!match) {
@@ -765,11 +808,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         buttons.forEach((button) => {
             button.addEventListener("click", () => {
-                if (!connectedUser) {
-                    window.mpmFirebase?.openAuthModal();
-                    return;
-                }
-
                 const matchId = button.dataset.editMatch;
                 const prediction = predictions[matchId];
 
@@ -926,19 +964,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-        function isMatchLocked(match){
-    return new Date() >= new Date(match.kickoff);
-}
+    function isMatchLocked(match) {
+        if (!match.kickoff) return false;
 
-    window.addEventListener("mpm-auth-change", (event) => {
-        connectedUser = event.detail.user;
+        const kickoffDate = new Date(match.kickoff);
+        if (Number.isNaN(kickoffDate.getTime())) return false;
 
-        if (connectedUser) {
-            predictions = event.detail.predictions || {};
-        } else {
-            predictions = {};
-        }
+        return new Date() >= kickoffDate;
+    }
 
+    window.addEventListener("storage", (event) => {
+        if (event.key !== ADMIN_MATCHES_KEY) return;
+
+        matches = loadAdminMatches();
         renderMatches();
         renderMyPredictions();
     });
