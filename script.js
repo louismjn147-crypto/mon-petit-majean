@@ -108,8 +108,8 @@ dernierTotalEnregistre = null;
                 renderMatches();
                 renderMyPredictions();
                 
-                pronosticsCharges = true;
-                recalculerTotalJoueur();
+                matchsCharges = true;
+recalculerTotalJoueur();
             },
 
             function (erreur) {
@@ -336,6 +336,8 @@ function ecouterPronosticsFirebase(userId) {
 
                 renderMatches();
                 renderMyPredictions();
+                pronosticsCharges = true;
+recalculerTotalJoueur();
             },
 
             function (erreur) {
