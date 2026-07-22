@@ -234,7 +234,9 @@ recalculerTotalJoueur();
             Inter Milan: "logo/Inter Milan.png",
             Naples: "logo/Naples.png",
             AS Roma: "logo/AS Roma.png",
-            Como 1907: "logo/Como 1907.png"
+            Como 1907: "logo/Como 1907.png",
+            Bayern Munich: "logo/Bayern Munich.png"
+            
         };
 
         return logos[normalizeTeamName(teamName)] || "";
