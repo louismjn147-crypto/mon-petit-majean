@@ -223,19 +223,19 @@ recalculerTotalJoueur();
 
     function getTeamLogo(teamName) {
         const logo = {
-            ParisSG: "logo/Paris SG.png",
-            LilleOSC: "logo/Lille OSC.png",
-            RCLens: "logo/RC Lens.png",
-            ManchesterCity: "logo/Manchester City.png",
-            ManchesterUnited: "logo/Manchester United.png",
+            Paris: "logo/Paris.png",
+            Lille: "logo/Lille.png",
+            RCLens: "logo/Lens.png",
+            ManchesterCity: "logo/ManchesterCity.png",
+            ManchesterUnited: "logo/ManchesterUnited.png",
             Arsenal: "logo/Arsenal.png",
-            AstonVilla: "logo/Aston Villa.png",
+            AstonVilla: "logo/AstonVilla.png",
             Liverpool: "logo/Liverpool.png",
-            InterMilan: "logo/Inter Milan.png",
+            Inter: "logo/Inter.png",
             Naples: "logo/Naples.png",
-            ASRoma: "logo/AS Roma.png",
-            Como1907: "logo/Como 1907.png",
-            BayernMunich: "logo/Bayern Munich.png"
+            Roma: "logo/Roma.png",
+            Como1: "logo/Como.png",
+            Bayern: "logo/Bayern.png"
             
         };
 
