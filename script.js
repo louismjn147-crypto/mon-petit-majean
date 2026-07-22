@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const EXACT_SCORE_BONUS = 150;
     const STORAGE_KEY = "monPetitMajeanPredictionsV20";
+    const ADMIN_MATCHES_KEY = "adminMatches";
 
 let matches = [];
 let arreterEcouteMatchs = null;
@@ -94,34 +95,34 @@ afficherClassementDeconnecte();
             collectionMatchs,
 
             function (snapshot) {
-                matches = snapshot.docs
-                    .map(function (document, index) {
-                        return convertAdminMatch(
-                            {
-                                id: document.id,
-                                ...document.data()
-                            },
-                            index
-                        );
-                    })
-                    .sort(function (premierMatch, deuxiemeMatch) {
-                        const dateA = premierMatch.kickoff || "";
-                        const dateB = deuxiemeMatch.kickoff || "";
+    matches = snapshot.docs
+        .map(function (document, index) {
+            return convertAdminMatch(
+                {
+                    id: document.id,
+                    ...document.data()
+                },
+                index
+            );
+        })
+        .sort(function (premierMatch, deuxiemeMatch) {
+            const dateA = premierMatch.kickoff || "";
+            const dateB = deuxiemeMatch.kickoff || "";
 
-                        return dateA.localeCompare(dateB);
-                    });
+            return dateA.localeCompare(dateB);
+        });
 
-                console.log(
-                    `✅ ${matches.length} match(s) chargé(s) depuis Firebase`
-                );
+    console.log(
+        `✅ ${matches.length} match(s) chargé(s) depuis Firebase`
+    );
 
-                renderMatches();
-                renderMyPredictions();
-                renderArchives();
-                
-                matchsCharges = true;
-recalculerTotalJoueur();
-            },
+    matchsCharges = true;
+
+    renderMatches();
+    renderMyPredictions();
+    renderArchives();
+    recalculerTotalJoueur();
+},
 
             function (erreur) {
                 console.error(
